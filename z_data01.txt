@@ -1,7 +1,0 @@
-0;Die Geschichte beginnt;Donnerstag, 17. August 2017;Zwei Helden starten ihre gefährliche Reise durch den verwucherten Dschungel der Visualisierung.;Renérino+Christ
-1;Ein neuer Tag;Freitag, 18. August 2017;Bei den Feierlichkeiten zum 713. Jubiläum des französischen Sieges über die Flamen in der Schlacht von Mons-en-Pévèle treffen Dr. Good Gooderich und Bad MacGuy aufeinander. In der darauf folgenden Auseinandersetzung verliert Timmy ein Auge.;Dr. Good Gooderich+Bad MacGuy+Timmy+Party Random
-4;Emotionaler Abschied;Montag, 21. August 2017;Christ und Dr. Good Gooderich starten ihre Reise nach Konstantinopel;Christ+Dr. Good Gooderich+Zurückgelassener Random
-15;Hinterlistige Pläne;;Renérino und Bad MacGuy hecken etwas aus;Renérino+Bad MacGuy
--2;Geburt Christi;15. August 2017;Eine Legende wird geboren;Christ+Mom von Christ
-16;Ankunft;September 2017;Christ und der Doctor kommen in Konstantinopel an.;Christ+Dr. Good Gooderich+Mayor of Konstantinopel
-20;Entscheidungsschlacht;September 2017;Renérino und Bad MacGuy werden in einem demütigen Hearthstone-Match von Christ zerstört, nachdem sich Dr. Good Gooderich für 1 nicen topdeck geopfert hat;Christ+Dr. Good Gooderich+Renérino+Bad MacGuy+Emma Stone
