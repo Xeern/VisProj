@@ -1,4 +1,5 @@
-package timeline;
+package timeline.story;
+
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -11,13 +12,16 @@ import java.awt.geom.RectangularShape;
 
 import javax.swing.JPanel;
 
-public class StoryTimeline extends JPanel {
+import timeline.window.Window;
+
+public class View extends JPanel {
 	
 	public void paint(Graphics g) {
 		
 		Graphics2D g2D = (Graphics2D)g;
 		g2D.scale(1, 1);
         
+        g2D.drawLine(400, 0, 400, 600);
         
         Rectangle2D rect = new Rectangle2D.Double(50,50,200,200);
         Rectangle2D rect2 = new Rectangle2D.Double(10,10,100,100);
