@@ -21,7 +21,10 @@ public class View extends JPanel {
 		Graphics2D g2D = (Graphics2D)g;
 		g2D.scale(1, 1);
         
-        g2D.drawLine(400, 0, 400, 600);
+		int x = getWidth()/2;
+		int y = getHeight();
+		
+        g2D.drawLine(x, y, x, 0);
         
         Rectangle2D rect = new Rectangle2D.Double(50,50,200,200);
         Rectangle2D rect2 = new Rectangle2D.Double(10,10,100,100);
