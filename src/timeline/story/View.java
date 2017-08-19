@@ -1,41 +1,29 @@
 package timeline.story;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import timeline.window.Window;
-
 public class View extends JPanel {
+	ArrayList<Point2D> storyPoints = new ArrayList<Point2D>();
 	
 	public void paint(Graphics g) {
-		
 		Graphics2D g2D = (Graphics2D)g;
-		g2D.scale(1, 1);
+        int midX = getWidth()/2;
         
-        g2D.drawLine(400, 0, 400, 600);
+        Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
         
-        Rectangle2D rect = new Rectangle2D.Double(50,50,200,200);
-        Rectangle2D rect2 = new Rectangle2D.Double(10,10,100,100);
-        
-        Color color1 = Color.BLUE;
-        
-        g2D.setColor(color1);
-        g2D.fill(rect);
-        Color color2 = Color.GREEN;
-        g2D.setColor(color2);
-        g2D.draw(rect);
-        
-        g2D.scale(1, 1);
-        Color color3 = Color.BLACK;
-        g2D.fill(rect2);
+        g2D.draw(mainLine);
+        Point2D start = mainLine.getP1();
+        Point2D end = mainLine.getP2();
+        for(double y = start.getY(); y <= end.getY(); y += 50) {
+        	Point2D tmp = new Point2D.Double(midX-1,y);
+        	storyPoints.add(tmp);
+        	g2D.drawOval((int)tmp.getX(), (int)tmp.getY(), 2, 2);
+        }
 	}
 }
