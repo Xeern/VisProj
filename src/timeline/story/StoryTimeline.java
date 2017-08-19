@@ -1,5 +1,9 @@
 package timeline.story;
 
+import timeline.story.Data;
+
+import java.io.IOException;
+
 import javax.swing.SwingUtilities;
 
 //import infovis.example.Example;
@@ -19,6 +23,12 @@ public class StoryTimeline {
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				try {
+					Data.importValues();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				Window application = new Window();
 				application.setView(new StoryTimeline().getView());
 				application.getJFrame().setVisible(true);
