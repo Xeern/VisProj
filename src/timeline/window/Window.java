@@ -56,16 +56,7 @@ public class Window {
 
 	private JLabel aboutVersionLabel = null;
 
-	private JPanel view = null;
-
-	public int getWidth() {
-		return jFrame.getWidth();
-	}
-	
-	public int getHeight() {
-		return jFrame.getHeight();
-	}
-	
+	private JPanel view = null;	
 	
 	public JFrame getJFrame() {
 		if (jFrame == null) {

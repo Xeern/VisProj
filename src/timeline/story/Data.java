@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Data{
-	public static HashMap<Integer, ArrayList> events = new HashMap<Integer, ArrayList>(); 
+//	public static HashMap<Integer, ArrayList<String>> events = new HashMap<Integer, ArrayList<String>>(); 
 	
 	public static void importValues() throws IOException {
 		try {
@@ -35,14 +35,14 @@ public class Data{
 				//System.out.println(line);
 				String[] splitter = line.split(";", 5);
 				
-				int itemp = Integer.parseInt(splitter[0]);
+//				int itemp = Integer.parseInt(splitter[0]);
 				List<String> temp = new ArrayList<String>(); 
 				for(int i = 1; i < 5; i++) {
 					temp.add(splitter[i]);
 				}
 				System.out.println(temp);
 				
-				events.put(itemp,(ArrayList) temp);
+//				events.put(itemp,(ArrayList) temp);
 			}
 		
 		} catch (FileNotFoundException e) {
