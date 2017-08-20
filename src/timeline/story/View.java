@@ -23,8 +23,8 @@ public class View extends JPanel {
         Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
 
         g2D.draw(mainLine);
-        Point2D start = mainLine.getP1();
-        Point2D end = mainLine.getP2();
+        Point2D start = mainLine.getP2();
+        Point2D end = mainLine.getP1();
         
         Map<Integer, ArrayList<String>> sorted_events = new TreeMap<Integer, ArrayList<String>>(Data.events);
         int ecount = sorted_events.size();
@@ -35,14 +35,27 @@ public class View extends JPanel {
         
         int range = lastInsertedEntry.getKey() - firstInsertedEntry.getKey();
         
-        System.out.println(firstInsertedEntry);
-        System.out.println(lastInsertedEntry);
-        System.out.println(sorted_events);
+//        System.out.println(firstInsertedEntry);
+//        System.out.println(lastInsertedEntry);
+//        System.out.println(sorted_events);
         
-        for(double y = start.getY(); y <= end.getY(); y += 50) {
-        	Point2D tmp = new Point2D.Double(midX-1,y);
-        	storyPoints.add(tmp);
-        	g2D.drawOval((int)tmp.getX(), (int)tmp.getY(), 2, 2);
+        double storyLength = start.distance(end);
+        double freeSpace = storyLength*0.01;
+        storyLength = storyLength*0.98;
+        double storyStep = storyLength/range;
+        int currentSegment = firstInsertedEntry.getKey();
+        
+        for(int i = 0; i <= range; i++) {
+        	Point2D currentStoryPoint = new Point2D.Double(midX-3,start.getY()-(freeSpace+i*storyStep));
+        	if (sorted_events.get(currentSegment) != null) {
+        		ArrayList<String> label = sorted_events.get(currentSegment);
+        		g2D.drawOval((int)currentStoryPoint.getX(), (int)currentStoryPoint.getY(), 6, 1);
+        		currentSegment += 1;
+        		storyPoints.add(currentStoryPoint);
+        			} else {
+        		currentSegment += 1;
+        		}
         }
+        System.out.println(storyPoints);
 	}
 }

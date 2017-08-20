@@ -44,7 +44,7 @@ public class Data{
 				
 				events.put(itemp, temp);
 			}
-			System.out.println(events);
+//			System.out.println(events);
 		
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
