@@ -11,6 +11,7 @@ import timeline.window.Window;
 
 public class StoryTimeline {
 	private View view = null;
+	private MouseController mouse = null;
 	
 	public View getView() {
 		if (view == null) generateDiagram();
@@ -18,6 +19,10 @@ public class StoryTimeline {
 	}
 	public void generateDiagram(){
 	   view = new View();
+	   mouse = new MouseController();
+	   view.addMouseListener(mouse);
+	   view.addMouseMotionListener(mouse);
+	   mouse.setView(view);
 	}
 	
 	public static void main(String[] args) {
