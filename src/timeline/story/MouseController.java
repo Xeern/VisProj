@@ -55,16 +55,18 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		Graphics2D currentGraphic = (Graphics2D)view.getGraphics();
-		for(int i = 0; i < view.storyEllipses.size(); ++i) {
-			Ellipse2D tmp = view.storyEllipses.get(i);
-			if(tmp.contains(x, y)) {
-				currentGraphic.setColor(Color.BLUE);
-				currentGraphic.draw(tmp);
-				currentGraphic.fill(tmp);
-			} else {
-				currentGraphic.setColor(Color.BLACK);
-				currentGraphic.draw(tmp);
-				currentGraphic.fill(tmp);
+		if(view.overview == true) {
+			for(int i = 0; i < view.storyEllipses.size(); ++i) {
+				Ellipse2D tmp = view.storyEllipses.get(i);
+				if(tmp.contains(x, y)) {
+					currentGraphic.setColor(Color.BLUE);
+					currentGraphic.draw(tmp);
+					currentGraphic.fill(tmp);
+				} else {
+					currentGraphic.setColor(Color.BLACK);
+					currentGraphic.draw(tmp);
+					currentGraphic.fill(tmp);
+				}
 			}
 		}
 	}
