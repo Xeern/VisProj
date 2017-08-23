@@ -27,36 +27,25 @@ public class View extends JPanel {
 	Color pointColor = Color.BLACK;
 	
 	
-	
 	public void paint(Graphics g) {
 		Graphics2D g2D = (Graphics2D)g;
         g2D.clearRect(0, 0, getWidth(), getHeight());
-        int midX = getWidth()/2;
-        
-        Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
-        
-        g2D.draw(mainLine);
-        Point2D start = mainLine.getP2();
-        Point2D end = mainLine.getP1();
+
+        if(overview == true) {
+        	drawOverview(g2D);
+        }
         
 //        Map<Integer, ArrayList<String>> sorted_events = new TreeMap<Integer, ArrayList<String>>(Data.events);
-        int ecount = sorted_events.size();
+
         
-        List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
-        Entry<Integer, ArrayList<String>> firstInsertedEntry = list.get(0);
-        Entry<Integer, ArrayList<String>> lastInsertedEntry = list.get(ecount-1);
-        
-        int range = lastInsertedEntry.getKey() - firstInsertedEntry.getKey();
+
+
         
 //        System.out.println(firstInsertedEntry);
 //        System.out.println(lastInsertedEntry);
 //        System.out.println(sorted_events);
         
-        double storyLength = start.distance(end);
-        double freeSpace = storyLength*0.02;
-        storyLength = storyLength*0.92;
-        double storyStep = storyLength/range;
-        int currentSegment = firstInsertedEntry.getKey();
+
         
 //        Graphics2D part = g2D;
 //        part.scale(2, 2);
@@ -65,6 +54,31 @@ public class View extends JPanel {
 //        part.translate(0, getHeight()/2);
 
         
+		       
+	}
+	
+	public void drawOverview(Graphics2D g2D) {
+        int midX = getWidth()/2;
+        
+        Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
+        g2D.draw(mainLine);
+        Point2D start = mainLine.getP2();
+        Point2D end = mainLine.getP1();
+        
+        int ecount = sorted_events.size();
+        
+        List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
+        Entry<Integer, ArrayList<String>> firstInsertedEntry = list.get(0);
+        Entry<Integer, ArrayList<String>> lastInsertedEntry = list.get(ecount-1);
+		
+        int range = lastInsertedEntry.getKey() - firstInsertedEntry.getKey();
+		
+        double storyLength = start.distance(end);
+        double freeSpace = storyLength*0.02;
+        storyLength = storyLength*0.92;
+        double storyStep = storyLength/range;
+        int currentSegment = firstInsertedEntry.getKey();
+		
 		storyPoints.clear();
 		storyEllipses.clear();
         for(int i = 0; i <= range; i++) {
@@ -89,6 +103,6 @@ public class View extends JPanel {
         	} else {
         		currentSegment += 1;
         	}
-        }       
+        }
 	}
 }
