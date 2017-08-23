@@ -17,18 +17,24 @@ import javax.swing.JPanel;
 import timeline.story.Data;
 
 public class View extends JPanel {
+	boolean overview = true;
+	boolean detailView = false;
+	
 	ArrayList<Point2D> storyPoints = new ArrayList<Point2D>();
 	ArrayList<Ellipse2D> storyEllipses = new ArrayList<Ellipse2D>();
 	Map<Integer, ArrayList<String>> sorted_events = new TreeMap<Integer, ArrayList<String>>(Data.events);
 	Map<Point2D,Integer> segmentAtPoint = new HashMap<Point2D,Integer>();
 	Color pointColor = Color.BLACK;
 	
+	
+	
 	public void paint(Graphics g) {
 		Graphics2D g2D = (Graphics2D)g;
+        g2D.clearRect(0, 0, getWidth(), getHeight());
         int midX = getWidth()/2;
-
+        
         Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
-
+        
         g2D.draw(mainLine);
         Point2D start = mainLine.getP2();
         Point2D end = mainLine.getP1();
@@ -52,6 +58,15 @@ public class View extends JPanel {
         double storyStep = storyLength/range;
         int currentSegment = firstInsertedEntry.getKey();
         
+//        Graphics2D part = g2D;
+//        part.scale(2, 2);
+//        part.translate(-getWidth()/4, -getHeight()/4);
+//        part.drawLine((int)start.getX(), (int)start.getY(), (int)end.getX(), (int)end.getY());
+//        part.translate(0, getHeight()/2);
+
+        
+		storyPoints.clear();
+		storyEllipses.clear();
         for(int i = 0; i <= range; i++) {
         	Point2D currentStoryPoint = new Point2D.Double(midX,start.getY()-(freeSpace+i*storyStep));
         	if (sorted_events.get(currentSegment) != null) {
@@ -74,7 +89,6 @@ public class View extends JPanel {
         	} else {
         		currentSegment += 1;
         	}
-        }
-        System.out.println(storyPoints);
+        }       
 	}
 }

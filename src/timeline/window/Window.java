@@ -6,9 +6,9 @@ import java.awt.Event;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,13 +16,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+
 import timeline.story.StoryTimeline;
+import timeline.story.MenuController;
 
 public class Window {
 	
@@ -55,6 +56,12 @@ public class Window {
 	private JPanel aboutContentPane = null;
 
 	private JLabel aboutVersionLabel = null;
+	
+	private JToolBar jJToolBarBar = null;
+
+	private JToggleButton overviewToggleButton = null;
+	
+	private JToggleButton detailToggleButton = null;
 
 	private JPanel view = null;	
 	
@@ -75,6 +82,7 @@ public class Window {
 			if (jContentPane == null) {
 				jContentPane = new JPanel();
 				jContentPane.setLayout(new BorderLayout());
+				jContentPane.add(getJJToolBarBar(), BorderLayout.NORTH);
 				jContentPane.add(getView(), BorderLayout.CENTER);
 			}
 			return jContentPane;
@@ -216,6 +224,54 @@ public class Window {
 						Event.CTRL_MASK, true));
 			}
 			return saveMenuItem;
+		}
+		
+		private JToolBar getJJToolBarBar() {
+			if (jJToolBarBar == null) {
+				jJToolBarBar = new JToolBar();
+				jJToolBarBar.add(getOverviewToggleButton());
+				jJToolBarBar.add(getDetailToggleButton());
+			}
+			return jJToolBarBar;
+		}
+		
+		private JToggleButton getOverviewToggleButton() {
+			if (overviewToggleButton == null) {
+				overviewToggleButton = new JToggleButton();
+				overviewToggleButton.setText("Overview");
+				overviewToggleButton.setSelected(true);
+				overviewToggleButton.addItemListener(new java.awt.event.ItemListener() {
+					public void itemStateChanged(java.awt.event.ItemEvent e) {
+						if (e.getStateChange() == ItemEvent.SELECTED){
+							MenuController.getInstance().toggleOverview(true);
+							detailToggleButton.setSelected(false);
+						}else if (e.getStateChange() == ItemEvent.DESELECTED){
+							MenuController.getInstance().toggleOverview(false);
+							detailToggleButton.setSelected(true);
+						}
+					}
+				});
+			}
+			return overviewToggleButton;
+		}
+		
+		private JToggleButton getDetailToggleButton() {
+			if (detailToggleButton == null) {
+				detailToggleButton = new JToggleButton();
+				detailToggleButton.setText("Detail View");
+				detailToggleButton.addItemListener(new java.awt.event.ItemListener() {
+					public void itemStateChanged(java.awt.event.ItemEvent e) {
+						if (e.getStateChange() == ItemEvent.SELECTED){
+							MenuController.getInstance().toggleOverview(false);
+							overviewToggleButton.setSelected(false);
+						}else if (e.getStateChange() == ItemEvent.DESELECTED){
+							MenuController.getInstance().toggleOverview(true);
+							overviewToggleButton.setSelected(true);
+						}
+					}
+				});
+			}
+			return detailToggleButton;
 		}
 
 		private JPanel getView() {

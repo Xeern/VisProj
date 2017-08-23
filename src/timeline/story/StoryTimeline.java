@@ -12,6 +12,7 @@ import timeline.window.Window;
 public class StoryTimeline {
 	private View view = null;
 	private MouseController mouse = null;
+	private MenuController menu = null;
 	
 	public View getView() {
 		if (view == null) generateDiagram();
@@ -20,9 +21,11 @@ public class StoryTimeline {
 	public void generateDiagram(){
 	   view = new View();
 	   mouse = new MouseController();
+	   menu = MenuController.getMenuController();
 	   view.addMouseListener(mouse);
 	   view.addMouseMotionListener(mouse);
 	   mouse.setView(view);
+	   menu.setView(view);
 	}
 	
 	public static void main(String[] args) {
