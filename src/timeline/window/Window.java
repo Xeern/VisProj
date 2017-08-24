@@ -274,7 +274,7 @@ public class Window {
 			return detailToggleButton;
 		}
 
-		private JPanel getView() {
+		public JPanel getView() {
 			if (view == null) {
 				view = new StoryTimeline().getView();
 			}

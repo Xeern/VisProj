@@ -2,9 +2,16 @@ package timeline.story;
 
 import timeline.story.Data;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.io.IOException;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayer;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.LayerUI;
 
 //import infovis.example.Example;
 import timeline.window.Window;
@@ -40,6 +47,8 @@ public class StoryTimeline {
 				Window application = new Window();
 				application.setView(new StoryTimeline().getView());
 				application.getJFrame().setVisible(true);
+				application.getView().setOpaque(false);
+				application.getView().setLayout(null);
 			}
 		});
 	}

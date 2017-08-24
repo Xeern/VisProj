@@ -25,11 +25,14 @@ public class MenuController {
 		if(b == true) {
 			view.overview = true;
 			view.detailView = false;
-			view.updateUI();
+//			view.updateUI();
+			view.repaint();
+
 		} else {
 			view.overview = false;
 			view.detailView = true;
-			view.updateUI();
+//			view.updateUI();
+			view.repaint();
 		}		
 	}
 	public View getView() {
