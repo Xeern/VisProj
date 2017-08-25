@@ -4,6 +4,7 @@ import timeline.story.Data;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -20,6 +21,7 @@ public class StoryTimeline {
 	private View view = null;
 	private MouseController mouse = null;
 	private MenuController menu = null;
+//	private KeyController key = null;
 	
 	public View getView() {
 		if (view == null) generateDiagram();
@@ -28,11 +30,14 @@ public class StoryTimeline {
 	public void generateDiagram(){
 	   view = new View();
 	   mouse = new MouseController();
+//	   key = new KeyController();
 	   menu = MenuController.getMenuController();
 	   view.addMouseListener(mouse);
 	   view.addMouseMotionListener(mouse);
+//	   view.addKeyListener(key);
 	   mouse.setView(view);
 	   menu.setView(view);
+//	   key.setView(view);
 	}
 	
 	public static void main(String[] args) {
