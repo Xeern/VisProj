@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,7 +41,6 @@ public class View extends JPanel {
 		Graphics2D g2D = (Graphics2D)g;
 //        g2D.clearRect(0, 0, getWidth(), getHeight());
 
-
         if(overview == true) {
 			drawOverview(g2D);
         }
@@ -50,7 +50,8 @@ public class View extends JPanel {
             
             Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
             
-            Point2D storyStart = storyPoints.get(1);
+//            Point2D storyStart = storyPoints.get(1);
+//            drawOverviewRect(g2D);
             
             Graphics2D part = g2D;
             part.scale(2, 2);
@@ -62,12 +63,18 @@ public class View extends JPanel {
             List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
     		
             createStorypoints(g2D, mainLine, ecount, list);
+            part.translate(getWidth()/4, getHeight()*2/4);
+    		g2D.scale(0.1, 0.1);
+    		drawOverview(g2D);
+//    		g2D.scale(5, 5);
         }
+        
         
 //        System.out.println(firstInsertedEntry);
 //        System.out.println(lastInsertedEntry);
 //        System.out.println(sorted_events);		       
 	}
+
 	
 	public void drawOverview(Graphics2D g2D) {
         int midX = getWidth()/2;
@@ -174,6 +181,8 @@ public class View extends JPanel {
         		
         		
         		g.draw(storyEllipse);
+        		//line is just for testing
+        		g.drawLine((int)storyEllipse.getX(), (int)storyEllipse.getY(), (int)storyEllipse.getX()+50, (int)storyEllipse.getY());
         		g.fill(storyEllipse);
                 segmentAtPoint.put(currentStoryPoint, currentSegment);
                 panelAtPoint.put(currentStoryPoint, viewPanel);
