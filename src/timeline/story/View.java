@@ -34,6 +34,7 @@ public class View extends JPanel {
 	ArrayList<Ellipse2D> storyEllipses = new ArrayList<Ellipse2D>();
 	Map<Integer, ArrayList<String>> sorted_events = new TreeMap<Integer, ArrayList<String>>(Data.events);
 	Map<Point2D,Integer> segmentAtPoint = new HashMap<Point2D,Integer>();
+	Map<Point2D,JPanel> panelAtPoint = new HashMap<Point2D,JPanel>();
 	
 	public void paint(Graphics g) {
 		Graphics2D g2D = (Graphics2D)g;
@@ -130,8 +131,8 @@ public class View extends JPanel {
         			if(sorted_events.get(currentSegment+j) != null) {                		
         				ArrayList<String> testlabels = sorted_events.get(currentSegment+j);
         				String testdate = testlabels.get(1);
-        				System.out.println(date + testdate); // !ERROR! last print = "September 2017September 2017", so why no increased counter???
-        				if (date == testdate) { // if so raise the counter
+        				System.out.println(date + testdate);
+        				if (date.equalsIgnoreCase(testdate)) { // if so raise the counter
         					datecounter += 1;
         					DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+i*storyStep));
         					System.out.println("found duplicate");
@@ -175,6 +176,7 @@ public class View extends JPanel {
         		g.draw(storyEllipse);
         		g.fill(storyEllipse);
                 segmentAtPoint.put(currentStoryPoint, currentSegment);
+                panelAtPoint.put(currentStoryPoint, viewPanel);
         		storyPoints.add(currentStoryPoint);
         		storyEllipses.add(storyEllipse);
         		currentSegment += 1;
