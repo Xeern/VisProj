@@ -30,6 +30,7 @@ public class View extends JPanel {
 	Window window = new Window();
 	boolean overview = true;
 	boolean detailView = false;
+	boolean overviewRect = false;
 	
 	ArrayList<Point2D> storyPoints = new ArrayList<Point2D>();
 	ArrayList<Ellipse2D> storyEllipses = new ArrayList<Ellipse2D>();
@@ -63,9 +64,11 @@ public class View extends JPanel {
             List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
     		
             createStorypoints(g2D, mainLine, ecount, list);
+            overviewRect = true;
             part.translate(getWidth()/4, getHeight()*2/4);
     		g2D.scale(0.1, 0.1);
     		drawOverview(g2D);
+    		overviewRect = false;
 //    		g2D.scale(5, 5);
         }
         
@@ -131,6 +134,10 @@ public class View extends JPanel {
         		viewPanel.add(jtitle);
         		this.add(viewPanel);
         		viewPanel.updateUI();
+        		if(overviewRect == true) {
+        			System.out.println(title);
+        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + 251)));
+        		}
         		 
         		String date = labels.get(1);
         		
@@ -138,16 +145,16 @@ public class View extends JPanel {
         			if(sorted_events.get(currentSegment+j) != null) {                		
         				ArrayList<String> testlabels = sorted_events.get(currentSegment+j);
         				String testdate = testlabels.get(1);
-        				System.out.println(date + testdate);
+//        				System.out.println(date + testdate);
         				if (date.equalsIgnoreCase(testdate)) { // if so raise the counter
         					datecounter += 1;
         					DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+i*storyStep));
-        					System.out.println("found duplicate");
+//        					System.out.println("found duplicate");
         				}
         			}
         		}
         		
-        		System.out.println(datecounter);
+//        		System.out.println(datecounter);
         		
         		if (datecounter == 1) { // that should mean that you can draw the label vertical from first duplicate to last
         			int counterstart = i-datecounter; // get range
@@ -181,8 +188,6 @@ public class View extends JPanel {
         		
         		
         		g.draw(storyEllipse);
-        		//line is just for testing
-        		g.drawLine((int)storyEllipse.getX(), (int)storyEllipse.getY(), (int)storyEllipse.getX()+50, (int)storyEllipse.getY());
         		g.fill(storyEllipse);
                 segmentAtPoint.put(currentStoryPoint, currentSegment);
                 panelAtPoint.put(currentStoryPoint, viewPanel);
