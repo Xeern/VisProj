@@ -6,9 +6,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +31,12 @@ import timeline.story.StoryTimeline;
 public class View extends JPanel {
 	StoryTimeline story = new StoryTimeline();
 	Window window = new Window();
+	int lastHeight = 0;
+	boolean firstOpen = true;
 	boolean overview = true;
 	boolean detailView = false;
 	boolean overviewRect = false;
+	double translateY = 0.0;	
 	
 	ArrayList<Point2D> storyPoints = new ArrayList<Point2D>();
 	ArrayList<Ellipse2D> storyEllipses = new ArrayList<Ellipse2D>();
@@ -41,6 +47,16 @@ public class View extends JPanel {
 	public void paint(Graphics g) {
 		Graphics2D g2D = (Graphics2D)g;
 //        g2D.clearRect(0, 0, getWidth(), getHeight());
+		
+		if(translateY != 0.0) {
+			if(lastHeight != getHeight()) {
+				firstOpen = true;
+			}
+		}
+		if(firstOpen) {
+			translateY = getHeight()/2;
+			firstOpen = false;
+		}
 
         if(overview == true) {
 			drawOverview(g2D);
@@ -50,32 +66,83 @@ public class View extends JPanel {
             int midX = getWidth()/2;
             
             Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
-            
+    		Shape triDown = createDownTriangle();
+    		Shape triUp = createUpTriangle();
+
+			g2D.fill(triDown);
+			g2D.fill(triUp);
 //            Point2D storyStart = storyPoints.get(1);
-//            drawOverviewRect(g2D);
+            
+            Rectangle2D colorRect = new Rectangle2D.Double(0, translateY*0.2, getWidth()*0.2, getHeight()*0.1+1);
+            g2D.setColor(new Color(200,200,200,100));
+            g2D.fill(colorRect);
+            g2D.setColor(new Color(51,51,51));
             
             Graphics2D part = g2D;
             part.scale(2, 2);
-            part.translate(-getWidth()/4, -getHeight()*2/4);
+            part.translate(-getWidth()/4, -translateY);
             g2D.draw(mainLine);
+
             
             int ecount = sorted_events.size();
               
             List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
     		
             createStorypoints(g2D, mainLine, ecount, list);
+            
+			if(this.contains(0, (int)storyPoints.get(ecount-1).getY())) {
+				g2D.translate(getWidth()/4, translateY);
+				g2D.scale(0.5, 0.5);
+				g2D.setColor(new Color(238, 238, 238));
+				g2D.fill(triUp);
+				g2D.setColor(new Color(51,51,51));
+	            g2D.scale(2, 2);
+	            g2D.translate(-getWidth()/4, -translateY);
+			}
+			if(this.contains(0, (int)storyPoints.get(0).getY())) {
+				g2D.translate(getWidth()/4, translateY);
+				g2D.scale(0.5, 0.5);
+				g2D.setColor(new Color(238, 238, 238));
+				g2D.fill(triDown);
+				g2D.setColor(new Color(51,51,51));
+	            g2D.scale(2, 2);
+	            g2D.translate(-getWidth()/4, -translateY);
+			}
+            
             overviewRect = true;
-            part.translate(getWidth()/4, getHeight()*2/4);
+            part.translate(getWidth()/4, translateY);
     		g2D.scale(0.1, 0.1);
     		drawOverview(g2D);
     		overviewRect = false;
-//    		g2D.scale(5, 5);
         }
         
         
 //        System.out.println(firstInsertedEntry);
 //        System.out.println(lastInsertedEntry);
-//        System.out.println(sorted_events);		       
+//        System.out.println(sorted_events);	
+        lastHeight = getHeight();
+	}
+	
+	public Shape createDownTriangle() {
+	      final GeneralPath p0 = new GeneralPath();
+	      p0.moveTo(getWidth()-80.0f, getHeight()-40);
+	      p0.lineTo(getWidth()-40.0f, getHeight()-40);
+	      p0.lineTo(getWidth()-60.0f, getHeight()-20);
+	      p0.closePath();
+	      return p0;
+	}
+	
+	public Shape createUpTriangle() {
+	      final GeneralPath p0 = new GeneralPath();
+	      p0.moveTo(getWidth()-80.0f, 40);
+	      p0.lineTo(getWidth()-40.0f, 40);
+	      p0.lineTo(getWidth()-60.0f, 20);
+	      p0.closePath();
+	      return p0;
+	}
+	
+	public void setTranslateY(int translate) {
+		translateY = translate;
 	}
 
 	
@@ -125,18 +192,17 @@ public class View extends JPanel {
         		
         		JPanel viewPanel = new JPanel();
         		if(detailView == true) {
-            		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-getHeight()*2/4)*2);
+            		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
         		}
         		viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
-        		viewPanel.setBounds((int)currentStoryPoint.getX() + 5, (int)currentStoryPoint.getY() - 21, 200, 20);
+        		viewPanel.setBounds((int)currentStoryPoint.getX() + 10, (int)currentStoryPoint.getY() - 21, 200, 20);
         		
         		JLabel jtitle = new JLabel(title);
         		viewPanel.add(jtitle);
         		this.add(viewPanel);
         		viewPanel.updateUI();
         		if(overviewRect == true) {
-        			System.out.println(title);
-        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + 251)));
+        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
         		}
         		 
         		String date = labels.get(1);

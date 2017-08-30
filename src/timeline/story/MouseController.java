@@ -5,11 +5,14 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -28,6 +31,22 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
+		Shape triDown = createDownTriangle();
+		Shape triUp = createUpTriangle();
+		if(view.detailView == true) {
+			if(!view.contains(0, (int)view.storyPoints.get(6).getY())) {
+				if(triUp.contains(x,y)) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/2);
+					view.repaint();
+				}
+			}
+			if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
+				if(triDown.contains(x,y)) {	
+					view.setTranslateY((int)view.translateY + view.getHeight()/2);
+					view.repaint();
+				}
+			}
+		}
 		for(int i = 0; i < view.storyEllipses.size(); ++i) {
 			if(view.overview == true) {
 				Ellipse2D tmp = view.storyEllipses.get(i);
@@ -40,7 +59,8 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			}
 			if(view.detailView == true) {
 				double tmpX = view.storyEllipses.get(i).getMinX()-3;
-				double tmpY = (view.storyEllipses.get(i).getMinY()-view.getHeight()*2/4)*2;
+				double tmpY = (view.storyEllipses.get(i).getMinY()-view.translateY)*2;
+//				System.out.println("tmpY: " + tmpY);
 				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
 				if(tmp.contains(x,y)) {
 					Point2D currentPoint = view.storyPoints.get(i);
@@ -112,6 +132,8 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		Graphics2D currentGraphic = (Graphics2D)view.getGraphics();
+		Shape triDown = createDownTriangle();
+		Shape triUp = createUpTriangle();
 		for(int i = 0; i < view.storyEllipses.size(); ++i) {
 			if(view.overview == true) {
 				Ellipse2D tmp = view.storyEllipses.get(i);
@@ -126,8 +148,27 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				}
 			}
 			if(view.detailView == true) {
+				if(!view.contains(0, (int)view.storyPoints.get(6).getY())) {
+					if(triUp.contains(x,y)) {
+						currentGraphic.setColor(new Color(100, 100, 100));
+						currentGraphic.fill(triUp);
+					} else {
+						currentGraphic.setColor(new Color(54,54,54));
+						currentGraphic.fill(triUp);
+					}
+				}
+				if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
+					if(triDown.contains(x,y)) {
+						currentGraphic.setColor(new Color(100, 100, 100));
+						currentGraphic.fill(triDown);
+					} else {
+						currentGraphic.setColor(new Color(54,54,54));
+						currentGraphic.fill(triDown);
+					}
+				}
+
 				double tmpX = view.storyEllipses.get(i).getMinX()-3;
-				double tmpY = (view.storyEllipses.get(i).getMinY()-view.getHeight()*2/4)*2;
+				double tmpY = (view.storyEllipses.get(i).getMinY()-view.translateY)*2;
 				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
 				if(tmp.contains(x,y)) {
 					currentGraphic.setColor(Color.BLUE);
@@ -140,6 +181,24 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				}
 			}
 		}
+	}
+	
+	public Shape createDownTriangle() {
+	      final GeneralPath p0 = new GeneralPath();
+	      p0.moveTo(view.getWidth()-80.0f, view.getHeight()-40);
+	      p0.lineTo(view.getWidth()-40.0f, view.getHeight()-40);
+	      p0.lineTo(view.getWidth()-60.0f, view.getHeight()-20);
+	      p0.closePath();
+	      return p0;
+	}
+	
+	public Shape createUpTriangle() {
+	      final GeneralPath p0 = new GeneralPath();
+	      p0.moveTo(view.getWidth()-80.0f, 40);
+	      p0.lineTo(view.getWidth()-40.0f, 40);
+	      p0.lineTo(view.getWidth()-60.0f, 20);
+	      p0.closePath();
+	      return p0;
 	}
 	
 	public View getView() {
