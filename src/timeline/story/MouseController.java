@@ -27,6 +27,8 @@ import timeline.story.View;
 public class MouseController implements MouseListener,MouseMotionListener {
 	
 	private View view = null;
+	JPanel openPanel = null;
+	boolean open = false;
 	
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX();
@@ -47,11 +49,12 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				}
 			}
 		}
-		for(int i = 0; i < view.storyEllipses.size(); ++i) {
+		Point2D currentPoint = null;
+		for(int i = view.storyEllipses.size()-1; i >= 0; --i) {
 			if(view.overview == true) {
 				Ellipse2D tmp = view.storyEllipses.get(i);
 				if(tmp.contains(x, y)) {
-					Point2D currentPoint = view.storyPoints.get(i);
+					currentPoint = view.storyPoints.get(i);
 					int currentSegment = view.segmentAtPoint.get(currentPoint);
 					ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
 //					System.out.println(currentEvent);
@@ -63,49 +66,67 @@ public class MouseController implements MouseListener,MouseMotionListener {
 //				System.out.println("tmpY: " + tmpY);
 				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
 				if(tmp.contains(x,y)) {
-					Point2D currentPoint = view.storyPoints.get(i);
+					currentPoint = view.storyPoints.get(i);
 					int currentSegment = view.segmentAtPoint.get(currentPoint);
 					ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
-//					System.out.println(currentEvent);
-
-//					String date = currentEvent.get(1);
-//					JInternalFrame intframe = new JInternalFrame(date, false, true);
-//					intframe.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 500);
-					JPanel viewPanel = view.panelAtPoint.get(currentPoint);
-	        		viewPanel.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 500);
-	        		viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
-	        		
-//	        		JLabel titel = (JLabel) viewPanel.getComponent(0);
-//	        		titel.setFont(new Font("Courier New", 0, 14));
-	        		
-					String content = currentEvent.get(2);
-					JTextArea textArea = new JTextArea(content);
-					textArea.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
-            		textArea.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() -10, 290, 300);
-            		
-					textArea.setFont(new Font("Serif", Font.PLAIN, 14));
-					textArea.setBackground(null);
-					textArea.setLineWrap(true);
-					textArea.setWrapStyleWord(true);
-	        		viewPanel.add(textArea);
-	        		
-	        		String characters = currentEvent.get(3);
-	        		System.out.println(characters);
-	        		String splittoken = Pattern.quote("+");
-					String[] splitter = characters.split(splittoken);
-					for(String j : splitter) {
-						JLabel jchar = new JLabel(j); 
-						viewPanel.add(jchar);
-					}
-
-//	        		viewPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-//					view.add(intframe);
-//	        		intframe.updateUI();
-//					viewPanel.repaint();
-					
+//					System.out.println(currentEvent);					
 				}
 			}
+		}		
+		if(openPanel != null) {
+			if(!openPanel.getBounds().contains(x, y)) {
+				view.setFalse();
+				openPanel.removeAll();
+				view.repaint();
+			}
 		}
+		if(currentPoint != null) {
+//			view.setFalse();
+			System.out.println("paint panel");
+			int currentSegment = view.segmentAtPoint.get(currentPoint);
+			ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
+			String content = currentEvent.get(2);
+			String characters = currentEvent.get(3);
+			int contentRows = (int)(Math.ceil(content.length()/45.0) + Math.ceil(characters.length()/45.0));
+		
+//			String date = currentEvent.get(1);
+//			JInternalFrame intframe = new JInternalFrame(date, false, true);
+//			intframe.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 500);
+			JPanel viewPanel = view.panelAtPoint.get(currentPoint);
+			viewPanel.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 25 + contentRows*25);
+//			viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
+			
+//			JLabel titel = (JLabel) viewPanel.getComponent(0);
+//			titel.setFont(new Font("Courier New", 0, 14));
+		
+			JTextArea textArea = new JTextArea(content);
+//			textArea.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
+			textArea.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() -10, 290, 25 + contentRows*55);
+		
+			textArea.setFont(new Font("Serif", Font.PLAIN, 14));
+			textArea.setOpaque(true);
+			textArea.setBackground(null);
+			textArea.setLineWrap(true);
+			textArea.setWrapStyleWord(true);
+			viewPanel.add(textArea);
+		
+//			System.out.println(characters);
+			String splittoken = Pattern.quote("+");
+			String[] splitter = characters.split(splittoken);
+			for(String j : splitter) {
+				JLabel jchar = new JLabel(j); 
+				viewPanel.add(jchar);
+			}
+		
+//			viewPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//			view.add(intframe);
+//			intframe.updateUI();
+//			viewPanel.repaint();
+			openPanel = viewPanel;
+			open = true;
+			view.setTrue();
+		}
+		openPanel.setBackground(Color.WHITE);
 	}
 	
 	public void mouseEntered(MouseEvent arg0) {

@@ -36,7 +36,9 @@ public class View extends JPanel {
 	boolean overview = true;
 	boolean detailView = false;
 	boolean overviewRect = false;
-	double translateY = 0.0;	
+	double translateY = 0.0;
+	
+	boolean alreadyPainted = false;
 	
 	ArrayList<Point2D> storyPoints = new ArrayList<Point2D>();
 	ArrayList<Ellipse2D> storyEllipses = new ArrayList<Ellipse2D>();
@@ -45,6 +47,8 @@ public class View extends JPanel {
 	Map<Point2D,JPanel> panelAtPoint = new HashMap<Point2D,JPanel>();
 	
 	public void paint(Graphics g) {
+		System.out.println("____paint");
+		System.out.println("view start: " + alreadyPainted);
 		Graphics2D g2D = (Graphics2D)g;
 //        g2D.clearRect(0, 0, getWidth(), getHeight());
 		
@@ -88,7 +92,10 @@ public class View extends JPanel {
               
             List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
     		
-            createStorypoints(g2D, mainLine, ecount, list);
+            if(!alreadyPainted) {
+            	createStorypoints(g2D, mainLine, ecount, list);
+            }
+            alreadyPainted = false;
             
 			if(this.contains(0, (int)storyPoints.get(ecount-1).getY())) {
 				g2D.translate(getWidth()/4, translateY);
@@ -121,6 +128,7 @@ public class View extends JPanel {
 //        System.out.println(lastInsertedEntry);
 //        System.out.println(sorted_events);	
         lastHeight = getHeight();
+        System.out.println("view end: " + alreadyPainted);
 	}
 	
 	public Shape createDownTriangle() {
@@ -144,6 +152,14 @@ public class View extends JPanel {
 	public void setTranslateY(int translate) {
 		translateY = translate;
 	}
+	
+	public void setTrue() {
+		alreadyPainted = true;
+	}
+	
+	public void setFalse() {
+		alreadyPainted = false;
+	}
 
 	
 	public void drawOverview(Graphics2D g2D) {
@@ -156,7 +172,10 @@ public class View extends JPanel {
         
         List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
         
-        createStorypoints(g2D, mainLine, ecount, list);
+        if(!alreadyPainted) {
+        	createStorypoints(g2D, mainLine, ecount, list);
+        }
+        alreadyPainted = false;
 	}
 	
 	
@@ -186,6 +205,19 @@ public class View extends JPanel {
         	Point2D currentStoryPoint = new Point2D.Double(getWidth()/2,start.getY()-(freeSpace+i*storyStep));
         	if (sorted_events.get(currentSegment) != null) {
         		Ellipse2D storyEllipse = new Ellipse2D.Double((int)currentStoryPoint.getX()-2.5, (int)currentStoryPoint.getY()-2.5,5.0,5.0);
+        		if(overviewRect == true) {
+            		ArrayList<String> labels = sorted_events.get(currentSegment);
+            		String title = labels.get(0);
+            		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
+        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
+        			
+            		g.draw(storyEllipse);
+            		g.fill(storyEllipse);
+                    segmentAtPoint.put(currentStoryPoint, currentSegment);
+            		storyPoints.add(currentStoryPoint);
+            		storyEllipses.add(storyEllipse);
+            		currentSegment += 1;
+        		} else {
      
         		ArrayList<String> labels = sorted_events.get(currentSegment);
         		String title = labels.get(0);
@@ -194,16 +226,17 @@ public class View extends JPanel {
         		if(detailView == true) {
             		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
         		}
+        		if(overviewRect == true) {
+        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
+        		}
         		viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
+        		viewPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         		viewPanel.setBounds((int)currentStoryPoint.getX() + 10, (int)currentStoryPoint.getY() - 21, 200, 20);
         		
         		JLabel jtitle = new JLabel(title);
         		viewPanel.add(jtitle);
         		this.add(viewPanel);
         		viewPanel.updateUI();
-        		if(overviewRect == true) {
-        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
-        		}
         		 
         		String date = labels.get(1);
         		
@@ -260,6 +293,7 @@ public class View extends JPanel {
         		storyPoints.add(currentStoryPoint);
         		storyEllipses.add(storyEllipse);
         		currentSegment += 1;
+        		}
         	} else {
         		currentSegment += 1;
         	}
