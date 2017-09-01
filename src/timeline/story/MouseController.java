@@ -93,9 +93,9 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				openPanel.setBounds((Rectangle) oldBounds);
 			}
 		}
-		System.out.println(currentPoint);
+//		System.out.println(currentPoint);
 		if(currentPoint != null) {
-			System.out.println("paint panel");
+//			System.out.println("paint panel");
 			int currentSegment = view.segmentAtPoint.get(currentPoint);
 			ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
 			String content = currentEvent.get(2);

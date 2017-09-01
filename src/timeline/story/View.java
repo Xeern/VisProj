@@ -48,8 +48,8 @@ public class View extends JPanel {
 	Map<Point2D,JPanel> panelAtPoint = new HashMap<Point2D,JPanel>();
 	
 	public void paint(Graphics g) {
-		System.out.println("____paint");
-		System.out.println("view start: " + alreadyPainted);
+//		System.out.println("____paint");
+//		System.out.println("view start: " + alreadyPainted);
 		Graphics2D g2D = (Graphics2D)g;
 //        g2D.clearRect(0, 0, getWidth(), getHeight());
 		
@@ -129,7 +129,7 @@ public class View extends JPanel {
 //        System.out.println(lastInsertedEntry);
 //        System.out.println(sorted_events);	
         lastHeight = getHeight();
-        System.out.println("view end: " + alreadyPainted);
+//        System.out.println("view end: " + alreadyPainted);
 	}
 	
 	public Shape createDownTriangle() {
@@ -182,6 +182,7 @@ public class View extends JPanel {
 
 	public void drawOverview(String newchar) {
         Graphics2D g2D = (Graphics2D) this.getGraphics();
+        g2D.clearRect(0, 0, getWidth(), getHeight());
         
         int midX = getWidth()/2;
         Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
@@ -205,9 +206,9 @@ public class View extends JPanel {
         }
         
         int ecount = charlist.size();
-        System.out.println(ecount);
-        System.out.println(charlist);
-        System.out.println(list);
+//        System.out.println(ecount);
+//        System.out.println(charlist);
+//        System.out.println(list);
         
         if(!alreadyPainted) {
         	createStorypoints(g2D, mainLine, ecount, charlist);
@@ -235,6 +236,7 @@ public class View extends JPanel {
           String temp = list.get(i).getValue().get(0);
           titles.add(temp);
         }
+        System.out.println(titles);
         
         int datecounter = 0; // to check if there are duplicate dates
         Point2D DcheckPoint = start; // date check point 
@@ -244,20 +246,29 @@ public class View extends JPanel {
 		storyPoints.clear();
 		storyEllipses.clear();
         for(int i = 0; i <= range; i++) {
+        	boolean breakerino = false;
         	Point2D currentStoryPoint = new Point2D.Double(getWidth()/2,start.getY()-(freeSpace+i*storyStep));
             if (sorted_events.get(currentSegment) != null) {
+            	System.out.println("point: " + i);
             	Ellipse2D storyEllipse = new Ellipse2D.Double((int)currentStoryPoint.getX()-2.5, (int)currentStoryPoint.getY()-2.5,5.0,5.0);
             	ArrayList<String> labels = sorted_events.get(currentSegment);
             	String title = labels.get(0);
               
+            	int tempCount = 0;
             	for(String s : titles) {
-            		int tempCount = 0;
             		if(!title.equalsIgnoreCase(s)) {
-            			tempCount +=1;
+            			tempCount += 1;
+            			System.out.println(title + " != " + s + "TempCount: " + tempCount);
             		}
             		if(tempCount == titles.size()) {
-            			break;
+            			System.out.println("break");
+            			breakerino = true;
             		}
+            	}
+            	if(breakerino) {
+            		System.out.println("skiped");
+            		currentSegment += 1;
+            		continue;
             	}
               
             	if(overviewRect == true) {
