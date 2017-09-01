@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
@@ -75,7 +76,7 @@ public class View extends JPanel {
 
 			g2D.fill(triDown);
 			g2D.fill(triUp);
-//            Point2D storyStart = storyPoints.get(1);
+//          Point2D storyStart = storyPoints.get(1);
             
             Rectangle2D colorRect = new Rectangle2D.Double(0, translateY*0.2, getWidth()*0.2, getHeight()*0.1+1);
             g2D.setColor(new Color(200,200,200,100));
@@ -178,6 +179,42 @@ public class View extends JPanel {
         alreadyPainted = false;
 	}
 	
+
+	public void drawOverview(String newchar) {
+        Graphics2D g2D = (Graphics2D) this.getGraphics();
+        
+        int midX = getWidth()/2;
+        Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
+        g2D.draw(mainLine);
+        
+        List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
+       
+        List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>(); 
+        
+        for(Entry e : list) {
+        	ArrayList<String> i = (ArrayList<String>) e.getValue();
+        	String chars = i.get(3);
+        	String splittoken = Pattern.quote("+");
+			String[] splitter = chars.split(splittoken);
+			for(String j : splitter) {
+				if(j.equalsIgnoreCase(newchar)) {
+					charlist.add(e);
+					System.out.println(j);
+				}
+			}
+        }
+        
+        int ecount = charlist.size();
+        System.out.println(ecount);
+        System.out.println(charlist);
+        System.out.println(list);
+        
+        if(!alreadyPainted) {
+        	createStorypoints(g2D, mainLine, ecount, charlist);
+        }
+        alreadyPainted = false;
+	}
+	
 	
 	public void createStorypoints(Graphics2D g, Line2D line,int ecount , List<Entry<Integer, ArrayList<String>>> list) {
 		Point2D start = line.getP2();
@@ -193,6 +230,11 @@ public class View extends JPanel {
         storyLength = storyLength*0.92;
         double storyStep = storyLength/range;
         int currentSegment = firstInsertedEntry.getKey();
+        ArrayList<String> titles = new ArrayList<String>();
+        for(int i = 0; i < list.size(); ++i){
+          String temp = list.get(i).getValue().get(0);
+          titles.add(temp);
+        }
         
         int datecounter = 0; // to check if there are duplicate dates
         Point2D DcheckPoint = start; // date check point 
@@ -203,26 +245,33 @@ public class View extends JPanel {
 		storyEllipses.clear();
         for(int i = 0; i <= range; i++) {
         	Point2D currentStoryPoint = new Point2D.Double(getWidth()/2,start.getY()-(freeSpace+i*storyStep));
-        	if (sorted_events.get(currentSegment) != null) {
-        		Ellipse2D storyEllipse = new Ellipse2D.Double((int)currentStoryPoint.getX()-2.5, (int)currentStoryPoint.getY()-2.5,5.0,5.0);
-        		if(overviewRect == true) {
-            		ArrayList<String> labels = sorted_events.get(currentSegment);
-            		String title = labels.get(0);
+            if (sorted_events.get(currentSegment) != null) {
+            	Ellipse2D storyEllipse = new Ellipse2D.Double((int)currentStoryPoint.getX()-2.5, (int)currentStoryPoint.getY()-2.5,5.0,5.0);
+            	ArrayList<String> labels = sorted_events.get(currentSegment);
+            	String title = labels.get(0);
+              
+            	for(String s : titles) {
+            		int tempCount = 0;
+            		if(!title.equalsIgnoreCase(s)) {
+            			tempCount +=1;
+            		}
+            		if(tempCount == titles.size()) {
+            			break;
+            		}
+            	}
+              
+            	if(overviewRect == true) {
             		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
-        			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
-        			
+            		g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
+                
             		g.draw(storyEllipse);
             		g.fill(storyEllipse);
                     segmentAtPoint.put(currentStoryPoint, currentSegment);
-            		storyPoints.add(currentStoryPoint);
-            		storyEllipses.add(storyEllipse);
-            		currentSegment += 1;
-        		} else {
-     
-        		ArrayList<String> labels = sorted_events.get(currentSegment);
-        		String title = labels.get(0);
-        		
-        		JPanel viewPanel = new JPanel();
+                    storyPoints.add(currentStoryPoint);
+                    storyEllipses.add(storyEllipse);
+                    currentSegment += 1;
+            	} else {
+            		JPanel viewPanel = new JPanel();
         		if(detailView == true) {
             		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
         		}
@@ -244,11 +293,9 @@ public class View extends JPanel {
         			if(sorted_events.get(currentSegment+j) != null) {                		
         				ArrayList<String> testlabels = sorted_events.get(currentSegment+j);
         				String testdate = testlabels.get(1);
-//        				System.out.println(date + testdate);
         				if (date.equalsIgnoreCase(testdate)) { // if so raise the counter
         					datecounter += 1;
         					DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+i*storyStep));
-//        					System.out.println("found duplicate");
         				}
         			}
         		}

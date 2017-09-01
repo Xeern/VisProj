@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -32,6 +33,17 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	boolean open = false;
 
 	Rectangle2D oldBounds = null;
+	
+	MouseListener labellistener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            JLabel label = (JLabel)e.getComponent();
+//            String labelchar = (String)((JLabel) e.getSource()).getText();
+            String labelchar = label.getText();
+            System.out.println("text: " + labelchar);
+            view.drawOverview(labelchar);
+        }
+    };
 	
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX();
@@ -90,16 +102,10 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			String characters = currentEvent.get(3);
 			int contentRows = (int)(Math.ceil(content.length()/45.0) + Math.ceil(characters.length()/45.0));
 		
-//			String date = currentEvent.get(1);
-//			JInternalFrame intframe = new JInternalFrame(date, false, true);
-//			intframe.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 500);
 			JPanel viewPanel = view.panelAtPoint.get(currentPoint);
 			oldBounds = (Rectangle2D) viewPanel.getBounds();
 			viewPanel.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 25 + contentRows*25);
 //			viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
-			
-//			JLabel titel = (JLabel) viewPanel.getComponent(0);
-//			titel.setFont(new Font("Courier New", 0, 14));
 		
 			JTextArea textArea = new JTextArea(content);
 //			textArea.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
@@ -117,18 +123,16 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			String[] splitter = characters.split(splittoken);
 			for(String j : splitter) {
 				JLabel jchar = new JLabel(j); 
+			    jchar.addMouseListener(labellistener);
 				viewPanel.add(jchar);
 			}
 		
-//			viewPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-//			view.add(intframe);
-//			intframe.updateUI();
 //			viewPanel.repaint();
 			openPanel = viewPanel;
 			open = true;
 			view.setTrue();
 		}
-		view.setFalse();
+//		view.setFalse();
 		openPanel.setBackground(Color.WHITE);
 	}
 	
