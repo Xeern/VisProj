@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -29,6 +30,8 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	private View view = null;
 	JPanel openPanel = null;
 	boolean open = false;
+
+	Rectangle2D oldBounds = null;
 	
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX();
@@ -72,16 +75,14 @@ public class MouseController implements MouseListener,MouseMotionListener {
 //					System.out.println(currentEvent);					
 				}
 			}
-		}		
+		}
 		if(openPanel != null) {
 			if(!openPanel.getBounds().contains(x, y)) {
-				view.setFalse();
-				openPanel.removeAll();
-				view.repaint();
+				openPanel.setBounds((Rectangle) oldBounds);
 			}
 		}
+		System.out.println(currentPoint);
 		if(currentPoint != null) {
-//			view.setFalse();
 			System.out.println("paint panel");
 			int currentSegment = view.segmentAtPoint.get(currentPoint);
 			ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
@@ -93,6 +94,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 //			JInternalFrame intframe = new JInternalFrame(date, false, true);
 //			intframe.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 500);
 			JPanel viewPanel = view.panelAtPoint.get(currentPoint);
+			oldBounds = (Rectangle2D) viewPanel.getBounds();
 			viewPanel.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 25 + contentRows*25);
 //			viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
 			
@@ -126,6 +128,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			open = true;
 			view.setTrue();
 		}
+		view.setFalse();
 		openPanel.setBackground(Color.WHITE);
 	}
 	
