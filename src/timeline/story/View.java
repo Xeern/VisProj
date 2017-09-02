@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -33,11 +34,17 @@ public class View extends JPanel {
 	StoryTimeline story = new StoryTimeline();
 	Window window = new Window();
 	int lastHeight = 0;
+	int storyRange;
+	int lowestStoryKey;
 	boolean firstOpen = true;
 	boolean overview = true;
 	boolean detailView = false;
 	boolean overviewRect = false;
 	double translateY = 0.0;
+	boolean mainView = true;
+	boolean charView = false;
+	
+	List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>(); 
 	
 	boolean alreadyPainted = false;
 	
@@ -62,74 +69,56 @@ public class View extends JPanel {
 			translateY = getHeight()/2;
 			firstOpen = false;
 		}
+		
 
-        if(overview == true) {
-			drawOverview(g2D);
+        List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
+
+        int ecount = sorted_events.size();
+        
+        Entry<Integer, ArrayList<String>> firstInsertedEntry = list.get(0);
+        Entry<Integer, ArrayList<String>> lastInsertedEntry = list.get(ecount-1);
+        lowestStoryKey = firstInsertedEntry.getKey();
+        
+        storyRange = lastInsertedEntry.getKey() - firstInsertedEntry.getKey();
+
+        if(overview) {
+        	if(mainView) {
+        		System.out.println("main");
+        		drawOverview(g2D, list);
+        	} else {
+        		System.out.println("char");
+        		drawOverview(g2D, charlist);
+        	}
         }
 
-        if(detailView == true) {
-            int midX = getWidth()/2;
-            
-            Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
-    		Shape triDown = createDownTriangle();
-    		Shape triUp = createUpTriangle();
-
-			g2D.fill(triDown);
-			g2D.fill(triUp);
-//          Point2D storyStart = storyPoints.get(1);
-            
-            Rectangle2D colorRect = new Rectangle2D.Double(0, translateY*0.2, getWidth()*0.2, getHeight()*0.1+1);
-            g2D.setColor(new Color(200,200,200,100));
-            g2D.fill(colorRect);
-            g2D.setColor(new Color(51,51,51));
-            
-            Graphics2D part = g2D;
-            part.scale(2, 2);
-            part.translate(-getWidth()/4, -translateY);
-            g2D.draw(mainLine);
-
-            
-            int ecount = sorted_events.size();
-              
-            List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
-    		
-            if(!alreadyPainted) {
-            	createStorypoints(g2D, mainLine, ecount, list);
-            }
-            alreadyPainted = false;
-            
-			if(this.contains(0, (int)storyPoints.get(ecount-1).getY())) {
-				g2D.translate(getWidth()/4, translateY);
-				g2D.scale(0.5, 0.5);
-				g2D.setColor(new Color(238, 238, 238));
-				g2D.fill(triUp);
-				g2D.setColor(new Color(51,51,51));
-	            g2D.scale(2, 2);
-	            g2D.translate(-getWidth()/4, -translateY);
-			}
-			if(this.contains(0, (int)storyPoints.get(0).getY())) {
-				g2D.translate(getWidth()/4, translateY);
-				g2D.scale(0.5, 0.5);
-				g2D.setColor(new Color(238, 238, 238));
-				g2D.fill(triDown);
-				g2D.setColor(new Color(51,51,51));
-	            g2D.scale(2, 2);
-	            g2D.translate(-getWidth()/4, -translateY);
-			}
-            
-            overviewRect = true;
-            part.translate(getWidth()/4, translateY);
-    		g2D.scale(0.1, 0.1);
-    		drawOverview(g2D);
-    		overviewRect = false;
+        if(detailView) {
+        	if(mainView) {
+        		System.out.println("main");
+        		drawDetailview(g2D, list);
+        	} else {
+        		System.out.println("char");
+        		drawDetailview(g2D, charlist);
+        	}
         }
-        
-        
-//        System.out.println(firstInsertedEntry);
-//        System.out.println(lastInsertedEntry);
-//        System.out.println(sorted_events);	
         lastHeight = getHeight();
 //        System.out.println("view end: " + alreadyPainted);
+	}
+	
+	public void getMainview() {
+		this.repaint();
+		mainView = true;
+		
+	}
+	
+	public Shape createCross() {
+		GeneralPath p0 = new GeneralPath();
+		float x = 20;
+		float y = getHeight()-20;
+		p0.moveTo(x-10, y+10);
+		p0.lineTo(x+10, y-10);
+		p0.moveTo(x-10, y-10);
+		p0.lineTo(x+10, y+10);
+		return p0;
 	}
 	
 	public Shape createDownTriangle() {
@@ -162,19 +151,76 @@ public class View extends JPanel {
 		alreadyPainted = false;
 	}
 
+	public void drawDetailview(Graphics2D g2D, List<Entry<Integer, ArrayList<String>>> list) {
+		int midX = getWidth()/2;
+        
+        Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
+		Shape triDown = createDownTriangle();
+		Shape triUp = createUpTriangle();
+		Shape cross = createCross();
+
+		g2D.fill(triDown);
+		g2D.fill(triUp);
+		if(!mainView) {
+			g2D.draw(cross);
+		}
+
+        
+        Rectangle2D colorRect = new Rectangle2D.Double(0, translateY*0.2, getWidth()*0.2, getHeight()*0.1+1);
+        g2D.setColor(new Color(200,200,200,100));
+        g2D.fill(colorRect);
+        g2D.setColor(new Color(51,51,51));
+        
+        Graphics2D part = g2D;
+        part.scale(2, 2);
+        part.translate(-getWidth()/4, -translateY);
+        g2D.draw(mainLine);
+
+        
+        if(!alreadyPainted) {
+        	createStorypoints(g2D, mainLine, list);
+        }
+        alreadyPainted = false;
+        
+		if(this.contains(0, (int)storyPoints.get(storyPoints.size()-1).getY())) {
+			g2D.translate(getWidth()/4, translateY);
+			g2D.scale(0.5, 0.5);
+			g2D.setColor(new Color(238, 238, 238));
+			g2D.fill(triUp);
+			g2D.setColor(new Color(51,51,51));
+            g2D.scale(2, 2);
+            g2D.translate(-getWidth()/4, -translateY);
+		}
+		if(this.contains(0, (int)storyPoints.get(0).getY())) {
+			g2D.translate(getWidth()/4, translateY);
+			g2D.scale(0.5, 0.5);
+			g2D.setColor(new Color(238, 238, 238));
+			g2D.fill(triDown);
+			g2D.setColor(new Color(51,51,51));
+            g2D.scale(2, 2);
+            g2D.translate(-getWidth()/4, -translateY);
+		}
+        
+        overviewRect = true;
+        part.translate(getWidth()/4, translateY);
+		g2D.scale(0.1, 0.1);
+		drawOverview(g2D, list);
+		overviewRect = false;
+	}
 	
-	public void drawOverview(Graphics2D g2D) {
+	public void drawOverview(Graphics2D g2D, List<Entry<Integer, ArrayList<String>>> list) {
         int midX = getWidth()/2;
         
         Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
+        Shape cross = createCross();
         g2D.draw(mainLine);
         
-        int ecount = sorted_events.size();
-        
-        List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
+		if(!mainView && !overviewRect) {
+			g2D.draw(cross);
+		}
         
         if(!alreadyPainted) {
-        	createStorypoints(g2D, mainLine, ecount, list);
+        	createStorypoints(g2D, mainLine, list);
         }
         alreadyPainted = false;
 	}
@@ -183,14 +229,12 @@ public class View extends JPanel {
 	public void drawOverview(String newchar) {
         Graphics2D g2D = (Graphics2D) this.getGraphics();
         g2D.clearRect(0, 0, getWidth(), getHeight());
-        
-        int midX = getWidth()/2;
-        Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
-        g2D.draw(mainLine);
+        Shape cross = createCross();
+        charlist.clear();
         
         List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
        
-        List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>(); 
+//        List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>(); 
         
         for(Entry e : list) {
         	ArrayList<String> i = (ArrayList<String>) e.getValue();
@@ -200,43 +244,41 @@ public class View extends JPanel {
 			for(String j : splitter) {
 				if(j.equalsIgnoreCase(newchar)) {
 					charlist.add(e);
-					System.out.println(j);
+//					System.out.println(j);
 				}
 			}
         }
         
-        int ecount = charlist.size();
-//        System.out.println(ecount);
-//        System.out.println(charlist);
-//        System.out.println(list);
-        
-        if(!alreadyPainted) {
-        	createStorypoints(g2D, mainLine, ecount, charlist);
+        if(overview == true) {
+        	g2D.draw(cross);
+			drawOverview(g2D, charlist);
         }
-        alreadyPainted = false;
+
+        if(detailView == true) {
+        	g2D.draw(cross);
+            drawDetailview(g2D, charlist);
+        }
+        mainView = false;
 	}
 	
 	
-	public void createStorypoints(Graphics2D g, Line2D line,int ecount , List<Entry<Integer, ArrayList<String>>> list) {
+	public void createStorypoints(Graphics2D g, Line2D line, List<Entry<Integer, ArrayList<String>>> list) {
 		Point2D start = line.getP2();
 		Point2D end = line.getP1();
 		
-        Entry<Integer, ArrayList<String>> firstInsertedEntry = list.get(0);
-        Entry<Integer, ArrayList<String>> lastInsertedEntry = list.get(ecount-1);
-		
-        int range = lastInsertedEntry.getKey() - firstInsertedEntry.getKey();
+        int range = storyRange;
 		
         double storyLength = start.distance(end);
         double freeSpace = storyLength*0.02;
         storyLength = storyLength*0.92;
         double storyStep = storyLength/range;
-        int currentSegment = firstInsertedEntry.getKey();
+        int currentSegment = lowestStoryKey;
         ArrayList<String> titles = new ArrayList<String>();
         for(int i = 0; i < list.size(); ++i){
-          String temp = list.get(i).getValue().get(0);
-          titles.add(temp);
+        	String temp = list.get(i).getValue().get(0);
+        	titles.add(temp);
         }
-        System.out.println(titles);
+//        System.out.println(titles);
         
         int datecounter = 0; // to check if there are duplicate dates
         Point2D DcheckPoint = start; // date check point 
@@ -249,7 +291,7 @@ public class View extends JPanel {
         	boolean breakerino = false;
         	Point2D currentStoryPoint = new Point2D.Double(getWidth()/2,start.getY()-(freeSpace+i*storyStep));
             if (sorted_events.get(currentSegment) != null) {
-            	System.out.println("point: " + i);
+//            	System.out.println("point: " + i);
             	Ellipse2D storyEllipse = new Ellipse2D.Double((int)currentStoryPoint.getX()-2.5, (int)currentStoryPoint.getY()-2.5,5.0,5.0);
             	ArrayList<String> labels = sorted_events.get(currentSegment);
             	String title = labels.get(0);
@@ -258,15 +300,13 @@ public class View extends JPanel {
             	for(String s : titles) {
             		if(!title.equalsIgnoreCase(s)) {
             			tempCount += 1;
-            			System.out.println(title + " != " + s + "TempCount: " + tempCount);
+//            			System.out.println(title + " != " + s + "TempCount: " + tempCount);
             		}
             		if(tempCount == titles.size()) {
-            			System.out.println("break");
             			breakerino = true;
             		}
             	}
             	if(breakerino) {
-            		System.out.println("skiped");
             		currentSegment += 1;
             		continue;
             	}
