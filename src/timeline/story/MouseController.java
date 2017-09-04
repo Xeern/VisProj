@@ -1,5 +1,6 @@
 package timeline.story;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -7,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -184,6 +186,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	ActionListener moveUp = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 			int length = view.getHeight()/2;
+			System.out.println(up.isRunning());
 			if(0 < view.translateY) {
 				if(view.translateY > length*13/14) {
 					view.setTranslateY((int)view.translateY - view.getHeight()/128);
@@ -240,9 +243,11 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		Shape cross = view.createCross();
 		if(cross.getBounds2D().contains(x, y) && !view.mainView) {
 			 currentGraphic.setColor(Color.RED);
+			 currentGraphic.setStroke(new BasicStroke(3));
 			 currentGraphic.draw(cross);
 		} else {
 			if(!view.mainView) {
+				currentGraphic.setStroke(new BasicStroke(3));
 				currentGraphic.draw(cross);
 			}
 			

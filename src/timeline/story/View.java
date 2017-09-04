@@ -1,5 +1,6 @@
 package timeline.story;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -8,6 +9,8 @@ import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -21,10 +24,13 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.TreeMap;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
+
 import timeline.story.Data;
 
 import timeline.window.Window;
@@ -43,6 +49,8 @@ public class View extends JPanel {
 	double translateY = 0.0;
 	boolean mainView = true;
 	boolean charView = false;
+	
+	double factor = 1.0;
 	
 	List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>(); 
 	
@@ -104,10 +112,24 @@ public class View extends JPanel {
 //        System.out.println("view end: " + alreadyPainted);
 	}
 	
+//	ActionListener scaleIn = new AbstractAction() {
+//		public void actionPerformed(ActionEvent e) {
+//			Graphics2D temp = (Graphics2D)View.this.getGraphics();
+//			if(detailView = true) {
+//				if(factor < 0.8) {
+//					factor += (1.0/10.0);
+//				}
+//				if(factor >= 0.8 && factor < 1) {
+//					factor += (1.0/20.0);
+//				}
+//				View.this.repaint();
+//			}
+//		}
+//	};
+	
 	public void getMainview() {
 		this.repaint();
-		mainView = true;
-		
+		mainView = true;	
 	}
 	
 	public Shape createCross() {
@@ -162,7 +184,9 @@ public class View extends JPanel {
 		g2D.fill(triDown);
 		g2D.fill(triUp);
 		if(!mainView) {
+			g2D.setStroke(new BasicStroke(3));
 			g2D.draw(cross);
+        	g2D.setStroke(new BasicStroke(1));
 		}
 
         
@@ -172,9 +196,11 @@ public class View extends JPanel {
         g2D.setColor(new Color(51,51,51));
         
         Graphics2D part = g2D;
-        part.scale(2, 2);
-        part.translate(-getWidth()/4, -translateY);
+        part.scale(2*factor, 2*factor);
+        part.translate(-getWidth()/4*factor, -translateY*factor);
         g2D.draw(mainLine);
+        System.out.println(factor);
+
 
         
         if(!alreadyPainted) {
@@ -216,7 +242,9 @@ public class View extends JPanel {
         g2D.draw(mainLine);
         
 		if(!mainView && !overviewRect) {
+			g2D.setStroke(new BasicStroke(3));
 			g2D.draw(cross);
+        	g2D.setStroke(new BasicStroke(1));
 		}
         
         if(!alreadyPainted) {
@@ -250,12 +278,16 @@ public class View extends JPanel {
         }
         
         if(overview == true) {
+			g2D.setStroke(new BasicStroke(3));
         	g2D.draw(cross);
+        	g2D.setStroke(new BasicStroke(1));
 			drawOverview(g2D, charlist);
         }
 
         if(detailView == true) {
+			g2D.setStroke(new BasicStroke(3));
         	g2D.draw(cross);
+        	g2D.setStroke(new BasicStroke(1));
             drawDetailview(g2D, charlist);
         }
         mainView = false;
@@ -408,4 +440,6 @@ public class View extends JPanel {
 		temp += "</html>";
 		return temp;
 	}
+
+//    Timer test = new Timer(2000,scaleIn);
 }
