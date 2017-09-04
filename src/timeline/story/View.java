@@ -83,20 +83,20 @@ public class View extends JPanel {
 
         if(overview) {
         	if(mainView) {
-        		System.out.println("main");
+//        		System.out.println("main");
         		drawOverview(g2D, list);
         	} else {
-        		System.out.println("char");
+//        		System.out.println("char");
         		drawOverview(g2D, charlist);
         	}
         }
 
         if(detailView) {
         	if(mainView) {
-        		System.out.println("main");
+//        		System.out.println("main");
         		drawDetailview(g2D, list);
         	} else {
-        		System.out.println("char");
+//        		System.out.println("char");
         		drawDetailview(g2D, charlist);
         	}
         }

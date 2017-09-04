@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,11 +20,13 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.Timer;
 
 import timeline.story.View;
 
@@ -31,6 +35,8 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	private View view = null;
 	JPanel openPanel = null;
 	boolean open = false;
+	Timer down = null;
+	Timer up = null;
 
 	Rectangle2D oldBounds = null;
 	
@@ -51,22 +57,31 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		Shape triDown = view.createDownTriangle();
 		Shape triUp = view.createUpTriangle();
 		Shape cross = view.createCross();
+		
 		if(cross.getBounds2D().contains(x, y)) {
 			view.getMainview();
 		}
+		
 		if(view.detailView == true) {
 			if(!view.contains(0, (int)view.storyPoints.get(view.storyPoints.size()-1).getY())) {
 				if(triUp.contains(x,y)) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/2);
-					view.repaint();
+					up = new Timer(10, moveUp);
+					up.start();
+					if(down != null) {
+						down.stop();
+					}
 				}
 			}
 			if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
-				if(triDown.contains(x,y)) {	
-					view.setTranslateY((int)view.translateY + view.getHeight()/2);
-					view.repaint();
+				if(triDown.contains(x,y)) {
+					down = new Timer(2, moveDown);
+					down.start();
+					if(up != null) {
+						up.stop();
+					}
 				}
 			}
+			
 		}
 		Point2D currentPoint = null;
 		for(int i = view.storyEllipses.size()-1; i >= 0; --i) {
@@ -130,14 +145,71 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			    jchar.addMouseListener(labellistener);
 				viewPanel.add(jchar);
 			}
-		
-//			viewPanel.repaint();
 			openPanel = viewPanel;
 			openPanel.setBackground(Color.WHITE);
 			view.setTrue();
 		}
-//		view.setFalse();
 	}
+	
+	ActionListener moveDown = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+			int length = view.getHeight()/2;
+			if(view.getHeight()/2 > view.translateY) {
+				if(view.translateY < length*1/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/128);
+				}
+				if(view.translateY >= length*1/12 && view.translateY < length*2/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/64);
+				}
+				if(view.translateY >= length*2/12 && view.translateY < length*4/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/18);
+				}
+				if(view.translateY >= length*4/12 && view.translateY < length*8/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/32);
+				}
+				if(view.translateY >= length*8/12 && view.translateY < length*10/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/64);
+				}
+				if(view.translateY >= length*10/12 && view.translateY < length*23/24) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/128);
+				}
+				if(view.translateY >= length*23/24) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/256);
+				}
+				view.repaint();
+			}
+		}
+	};
+
+	ActionListener moveUp = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+			int length = view.getHeight()/2;
+			if(0 < view.translateY) {
+				if(view.translateY > length*13/14) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/128);
+				}
+				if(view.translateY <= length*13/14 && view.translateY > length*10/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/64);
+				}
+				if(view.translateY <= length*10/12 && view.translateY > length*8/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/32);
+				}
+				if(view.translateY <= length*8/12 && view.translateY > length*4/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/18);
+				}
+				if(view.translateY <= length*4/12 && view.translateY > length*2/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/64);
+				}
+				if(view.translateY <= length*2/12 && view.translateY > length*1/24) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/128);
+				}
+				if(view.translateY <= length*1/24) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/256);
+				}
+				view.repaint();
+			}
+		}
+	};
 	
 	public void mouseEntered(MouseEvent arg0) {
 		
@@ -223,24 +295,6 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			}
 		}
 	}
-	
-//	public Shape createDownTriangle() {
-//	      final GeneralPath p0 = new GeneralPath();
-//	      p0.moveTo(view.getWidth()-80.0f, view.getHeight()-40);
-//	      p0.lineTo(view.getWidth()-40.0f, view.getHeight()-40);
-//	      p0.lineTo(view.getWidth()-60.0f, view.getHeight()-20);
-//	      p0.closePath();
-//	      return p0;
-//	}
-//	
-//	public Shape createUpTriangle() {
-//	      final GeneralPath p0 = new GeneralPath();
-//	      p0.moveTo(view.getWidth()-80.0f, 40);
-//	      p0.lineTo(view.getWidth()-40.0f, 40);
-//	      p0.lineTo(view.getWidth()-60.0f, 20);
-//	      p0.closePath();
-//	      return p0;
-//	}
 	
 	public View getView() {
 		return view;
