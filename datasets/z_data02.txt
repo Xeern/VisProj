@@ -5,3 +5,7 @@
 -2;Geburt Christi;15. August 2017;Eine Legende wird geboren;Christ+Mom von Christ
 16;Ankunft;September 2017;Christ und der Doctor kommen in Konstantinopel an.;Christ+Dr. Good Gooderich+Mayor of Konstantinopel
 20;Entscheidungsschlacht;September 2017;Renerino und Bad MacGuy werden in einem demuetigen Hearthstone-Match von Christ zerstoert, nachdem sich Dr. Good Gooderich fuer 1 nicen topdeck geopfert hat;Christ+Dr. Good Gooderich+Renerino+Bad MacGuy+Emma Stone
+-8;Prophezeihung;Januar 2017;Bad MacGuy und Dr. Good Gooderich sind Zeuge als der geheimnisvolle Prophet James Franco die Ankunft eines grossen Kriegers ankuendigt. Jener Krieger soll die Welt von einem schrecklichen Uebel befreien, er soll ein Gesetz verabschieden, das das Abspielen von Deutsch-Rap in Autos mit heruntergelassenen Fensterscheiben mit einem langen Gefaengsnissufenthalt bestraft.;Bad MacGuy+Dr.Good Gooderich+James Franco
+-32;Aussterben der Dinosaurier;2001;James Franco erschiesst alle Dinosaurier, die bis zu diesem Tage in einem Hohlraum unter der Erde im Himalaya ueberlebt haben.;Rex+James Franco
+-33;Murica;2001;James Franco kauft eine Waffe im Einkaufszentrum.;James Franco
+-34;Mal die Range testen;2001;James Franco macht irgendwas;James Franco

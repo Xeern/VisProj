@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,6 +32,7 @@ import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 import timeline.story.View;
+import timeline.window.Window;
 
 public class MouseController implements MouseListener,MouseMotionListener {
 	
@@ -125,13 +127,27 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		
 			JPanel viewPanel = view.panelAtPoint.get(currentPoint);
 			oldBounds = (Rectangle2D) viewPanel.getBounds();
-			viewPanel.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() - 21, 300, 25 + contentRows*25);
+			
+			viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - 21, 300, 25 + contentRows*25);
+
+			if((currentPoint.getY() - 21 + (25 + contentRows*25)) >= view.lastHeight) {
+				int ueberschuss = (int) (currentPoint.getY() - 21 + (25 + contentRows*25) - view.lastHeight) + 10;
+				int temp = (int) (currentPoint.getY() - 21 + (25 + contentRows*25));
+						
+				System.out.println("currentY: " + currentPoint.getY());
+				System.out.println("temp: " + temp);
+				System.out.println("lastheight: " + view.lastHeight);
+				System.out.println("ueberschuss: " + ueberschuss + "\n");
+			
+				viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - ueberschuss, 300, 25 + contentRows*25);				
+			}
+
 //			viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
-		
+			
 			JTextArea textArea = new JTextArea(content);
 //			textArea.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
-			textArea.setBounds((int)currentPoint.getX() + 5, (int)currentPoint.getY() -10, 290, 25 + contentRows*55);
-		
+			textArea.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() -10, 290, 25 + contentRows*55);
+			
 			textArea.setFont(new Font("Serif", Font.PLAIN, 14));
 			textArea.setOpaque(true);
 			textArea.setBackground(null);
