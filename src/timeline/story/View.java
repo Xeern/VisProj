@@ -7,11 +7,15 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -31,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
@@ -71,6 +76,7 @@ public class View extends JPanel {
 	
 	static JPanel buttonPanel = new JPanel();
 	static JButton newEvent = new JButton("New Event");
+	static JButton submit = new JButton("Submit");
 	
 	public void paint(Graphics g) {
 //		System.out.println("____paint");
@@ -339,6 +345,9 @@ public class View extends JPanel {
         	storyPoints.clear();
         	storyEllipses.clear();
         }
+        
+        newEvent.addActionListener(new ButtonListener());
+		
         for(int i = 0; i <= range; i++) {
         	boolean breakerino = false;
         	Point2D currentStoryPoint = new Point2D.Double(getWidth()/2,start.getY()-(freeSpace+i*storyStep));
@@ -433,7 +442,6 @@ public class View extends JPanel {
         		
         		buttonPanel.setBounds(30, getHeight()-50, 100, 30);
         		newEvent.setBounds(30, getHeight()-50, 100, 30);
-        		newEvent.addActionListener(new ButtonListener());
         		buttonPanel.add(newEvent);
         		this.add(buttonPanel);
         		
@@ -470,44 +478,121 @@ public class View extends JPanel {
 	public class ButtonListener implements ActionListener {
 		  ButtonListener() {
 		  }
-
+		  
+		  JFrame newEntryFr = new JFrame();  
+		  JTextField titlefield = new JTextField("", 15);
+	      JTextField datefield = new JTextField("", 12);
+	      JTextArea contentfield = new JTextArea(3, 80);
+	      JTextField charfield = new JTextField("", 40);
+		    
 		  public void actionPerformed(ActionEvent e) {
 //			  if (e.getActionCommand().equals("New Event")) {
 			  if (e.getSource() == newEvent) {
 		    	System.out.println("Button has been clicked");
-		    	JFrame newEntryFr = new JFrame();
-		        newEntryFr.setSize(1000, 300);
+		    	newEntryFr.setSize(500, 300);
 		        newEntryFr.setVisible(true);
 		        newEntryFr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    	JLabel tif = new JLabel("Title: ");
-		    	tif.setBounds(10, 10, 50, 30);
 		    	JLabel daf = new JLabel("Date: ");
-		    	tif.setBounds(10, 50, 50, 50);
 		    	JLabel cof = new JLabel("Text: ");
-		    	tif.setBounds(10, 90, 50, 50);
 		    	JLabel chf = new JLabel("Characters: ");
-		    	tif.setBounds(10, 140, 50, 50);
-		    	JTextField titlefield = new JTextField("", 15);
-		    	titlefield.setBounds(70, 10, 300, 30);
-		        JTextField datefield = new JTextField("", 12);
-		    	datefield.setBounds(70, 50, 300, 30);
-		        JTextField contentfield = new JTextField("", 80);
-		    	contentfield.setBounds(70, 90, 300, 30);
-		        JTextField charfield = new JTextField("", 40);
-		    	charfield.setBounds(70, 140, 300, 30);
-		    	JButton submit = new JButton("Submit");
-//		        submit.addActionListener(new BUttonlistener());
-		        JPanel gpanel = new JPanel();		      
-		        gpanel.add(tif, BorderLayout.WEST);
-		        gpanel.add(titlefield, BorderLayout.EAST);
-		        gpanel.add(daf, BorderLayout.WEST);
-		        gpanel.add(datefield, BorderLayout.EAST);
-		        gpanel.add(cof, BorderLayout.WEST);
-		        gpanel.add(contentfield, BorderLayout.EAST);
-		        gpanel.add(chf, BorderLayout.WEST);
-		        gpanel.add(charfield, BorderLayout.EAST);
-		        gpanel.add(submit, BorderLayout.CENTER);
+		    	contentfield.setOpaque(true);
+				contentfield.setLineWrap(true);
+				contentfield.setWrapStyleWord(true);
+		        JPanel gpanel = new JPanel(new GridBagLayout());
+		        GridBagConstraints lcons = new GridBagConstraints();
+		        GridBagConstraints tcons = new GridBagConstraints();
+		        lcons.gridx = 0;
+		        lcons.gridy = 0;
+		        gpanel.add(tif, lcons);
+		        lcons.gridy = 1;
+		        gpanel.add(daf, lcons);
+		        lcons.gridy = 2;
+		        gpanel.add(cof, lcons);
+		        lcons.gridy = 5;
+		        gpanel.add(chf, lcons);
+		        tcons.fill = GridBagConstraints.HORIZONTAL;
+		        tcons.gridwidth = 2;
+		        tcons.ipady = 10;
+		        tcons.gridx = 1;
+		        tcons.gridy = 0;
+		        tcons.weightx = 2;
+		        gpanel.add(titlefield, tcons);
+		        tcons.gridy = 1;
+		        gpanel.add(datefield, tcons);
+		        tcons.gridy = 2;
+		        tcons.gridheight = 3;
+		        gpanel.add(contentfield, tcons);
+		        tcons.gridy = 5;
+		        tcons.gridheight = 1;
+		        gpanel.add(charfield, tcons);
+		        lcons.gridy = 7;
+		        lcons.weightx = 3;
+		        lcons.gridwidth = 3;
+		        lcons.ipadx = 30;
+		        submit.addActionListener(new ButtonListener());
+		        gpanel.add(submit, lcons);
 		        newEntryFr.add(gpanel);
+//		        String titletext = titlefield.getText();
+//		        System.out.println(titletext);
+			  }
+		  
+//			  if (e.getActionCommand().equals("New Event")) {
+			  if (e.getSource() == submit) {
+		    	System.out.println("SUBMIT DAT ASS");
+		    	String newtitle = titlefield.getText();
+		    	String newdate = datefield.getText();
+		    	String newcontent = contentfield.getText();
+		    	String newchars = charfield.getText();
+		    	if ( newtitle.equals(null) ||  newdate.equals(null) || newcontent.equals(null) || newchars.equals(null)) {
+		    		System.out.println("DENIED: Submission not complete.");
+		    	} else {
+		    		System.out.println("title: " + newtitle);
+		    		System.out.println("date: " + newdate);
+		    		System.out.println("content: " + newcontent);
+		    		System.out.println("chars: " + newchars);
+		    		newEntryFr.dispatchEvent(new WindowEvent(newEntryFr, WindowEvent.WINDOW_CLOSING));
+		    	}
+//		    	JTextField titlefield = new JTextField("", 15);
+//		        JTextField datefield = new JTextField("", 12);
+//		        JTextArea contentfield = new JTextArea(3, 80);
+//		        JTextField charfield = new JTextField("", 40);
+//		    	JButton submit = new JButton("Submit");
+//		        submit.addActionListener(new ButtonListener());
+//		        JPanel gpanel = new JPanel(new GridBagLayout());
+//		        GridBagConstraints lcons = new GridBagConstraints();
+//		        GridBagConstraints tcons = new GridBagConstraints();
+//		        lcons.gridx = 0;
+//		        lcons.gridy = 0;
+//		        gpanel.add(tif, lcons);
+//		        lcons.gridy = 1;
+//		        gpanel.add(daf, lcons);
+//		        lcons.gridy = 2;
+//		        gpanel.add(cof, lcons);
+//		        lcons.gridy = 5;
+//		        gpanel.add(chf, lcons);
+//		        tcons.fill = GridBagConstraints.HORIZONTAL;
+//		        tcons.gridwidth = 2;
+//		        tcons.ipady = 10;
+//		        tcons.gridx = 1;
+//		        tcons.gridy = 0;
+//		        tcons.weightx = 2;
+//		        gpanel.add(titlefield, tcons);
+//		        tcons.gridy = 1;
+//		        gpanel.add(datefield, tcons);
+//		        tcons.gridy = 2;
+//		        tcons.gridheight = 3;
+//		        gpanel.add(contentfield, tcons);
+//		        tcons.gridy = 5;
+//		        tcons.gridheight = 1;
+//		        gpanel.add(charfield, tcons);
+//		        lcons.gridy = 7;
+//		        lcons.weightx = 3;
+//		        lcons.gridwidth = 3;
+//		        lcons.ipadx = 30;
+//		        gpanel.add(submit, lcons);
+//		        newEntryFr.add(gpanel);
+		        
 //		        String titletext = titlefield.getText();
 //		        System.out.println(titletext);
 			  }
