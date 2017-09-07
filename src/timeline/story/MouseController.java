@@ -2,10 +2,8 @@ package timeline.story;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -49,9 +47,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
         @Override
         public void mouseClicked(MouseEvent e) {
             JLabel label = (JLabel)e.getComponent();
-//            String labelchar = (String)((JLabel) e.getSource()).getText();
             String labelchar = label.getText();
-//            System.out.println("text: " + labelchar);
             view.drawOverview(labelchar);
             view.checkFirstEntry(view.charlist);
         }
@@ -175,10 +171,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - ueberschuss, 300, 25 + contentRows*25);	
 			}
 
-//			viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
-			
 			JTextArea textArea = new JTextArea(content);
-//			textArea.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
 			textArea.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() -10, 290, 25 + contentRows*55);
 			
 			textArea.setFont(new Font("Serif", Font.PLAIN, 14));
@@ -188,7 +181,6 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			textArea.setWrapStyleWord(true);
 			viewPanel.add(textArea);
 		
-//			System.out.println(characters);
 			String splittoken = Pattern.quote("+");
 			String[] splitter = characters.split(splittoken);
 			for(String j : splitter) {

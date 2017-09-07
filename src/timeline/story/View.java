@@ -1,7 +1,6 @@
 package timeline.story;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -9,13 +8,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -29,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.TreeMap;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -37,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.Timer;
 
 import timeline.story.Data;
 
@@ -79,6 +73,14 @@ public class View extends JPanel {
 	static JPanel buttonPanel = new JPanel();
 	static JButton newEvent = new JButton("New Event");
 	static JButton submit = new JButton("Submit");
+
+	JFrame newEntryFr = new JFrame();  
+	  
+	//User Input Textfields for New Entries
+	JTextField titlefield = new JTextField("", 15);
+    JTextField datefield = new JTextField("", 12);
+    JTextArea contentfield = new JTextArea(3, 80);
+    JTextField charfield = new JTextField("", 40);
 	
 	public void paint(Graphics g) {
 //		System.out.println("____paint");
@@ -126,7 +128,7 @@ public class View extends JPanel {
         	}
         }
         lastHeight = getHeight();
-//        System.out.println("view end: " + alreadyPainted);
+//      System.out.println("view end: " + alreadyPainted);
 	}
 	
 	public void getMainview() {
@@ -181,8 +183,8 @@ public class View extends JPanel {
 	
 	public Shape createCross() {
 		GeneralPath p0 = new GeneralPath();
-		float x = 20;
-		float y = getHeight()-20;
+		float x = getWidth()-60;
+		float y = getHeight()/2;
 		p0.moveTo(x-10, y+10);
 		p0.lineTo(x+10, y-10);
 		p0.moveTo(x-10, y-10);
@@ -427,49 +429,54 @@ public class View extends JPanel {
         		viewPanel.updateUI();
         		 
         		String date = labels.get(1);
+        		        		
+        		JPanel datePanel = new JPanel();
+        		datePanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
+        		datePanel.setBounds((int)currentStoryPoint.getX() - 105, (int)currentStoryPoint.getY() -18, 100, 20);
+    			JLabel jdate = new JLabel(date);
+    			jdate.setFont(new Font("Courier New",Font.ITALIC,10));
+    			datePanel.add(jdate);
+    			this.add(datePanel);
+    			datePanel.updateUI();
+    			
+    			// HANDLING OF DUPLICATE DATES <NOT WORKING (YET)>
+//        		for(int j = 1; j<=31; j++) { // check for the next month if the date occurs more than once
+//        			if(sorted_events.get(currentSegment+j) != null) {                		
+//        				ArrayList<String> testlabels = sorted_events.get(currentSegment+j);
+//        				String testdate = testlabels.get(1);
+//        				if (date.equalsIgnoreCase(testdate)) { // if so raise the counter
+//        					datecounter += 1;
+//        					DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+i*storyStep));
+//        				}
+//        			}
+//        		}
         		
-        		for(int j = 1; j<=31; j++) { // check for the next month if the date occurs more than once
-        			if(sorted_events.get(currentSegment+j) != null) {                		
-        				ArrayList<String> testlabels = sorted_events.get(currentSegment+j);
-        				String testdate = testlabels.get(1);
-        				if (date.equalsIgnoreCase(testdate)) { // if so raise the counter
-        					datecounter += 1;
-        					DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+i*storyStep));
-        				}
-        			}
-        		}
-        		
-//        		System.out.println(datecounter);
-        		
-        		if (datecounter == 1) { // that should mean that you can draw the label vertical from first duplicate to last
-        			int counterstart = i-datecounter; // get range
-        			DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+counterstart*storyStep));
-        			int yrange = (int)currentStoryPoint.getY() - (int)DcheckPoint.getY();
-        			JPanel datePanel = new JPanel();
-            		datePanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
-            		datePanel.setBounds((int)currentStoryPoint.getX() - 105, (int)currentStoryPoint.getY() -18, 100, yrange);
-            		JLabel jdate = new JLabel(date);
-        			jdate.setFont(new Font("Courier New",Font.ITALIC,8));
-        			jdate.setText(verticalText(date));
-        			datePanel.add(jdate);
-        			this.add(datePanel);
-        			datePanel.updateUI();
-        			datecounter = 0;
-        		} else if (datecounter > 1) {
-        			datecounter = 1;
-        		} else {
-        			JPanel datePanel = new JPanel();
-            		datePanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
-            		datePanel.setBounds((int)currentStoryPoint.getX() - 105, (int)currentStoryPoint.getY() -18, 100, 20);
-        			JLabel jdate = new JLabel(date);
-        			jdate.setFont(new Font("Courier New",Font.ITALIC,10));
-        			datePanel.add(jdate);
-        			this.add(datePanel);
-        			datePanel.updateUI();
-        		}
-        		
-//        		String content = labels.get(2);
-//        		String characters = labels.get(3);
+//        		if (datecounter == 1) { // that should mean that you can draw the label vertical from first duplicate to last
+//        			int counterstart = i-datecounter; // get range
+//        			DcheckPoint = new Point2D.Double(midX,start.getY()-(freeSpace+counterstart*storyStep));
+//        			int yrange = (int)currentStoryPoint.getY() - (int)DcheckPoint.getY();
+//        			JPanel datePanel = new JPanel();
+//            		datePanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
+//            		datePanel.setBounds((int)currentStoryPoint.getX() - 105, (int)currentStoryPoint.getY() -18, 100, yrange);
+//            		JLabel jdate = new JLabel(date);
+//        			jdate.setFont(new Font("Courier New",Font.ITALIC,8));
+//        			jdate.setText(verticalText(date));
+//        			datePanel.add(jdate);
+//        			this.add(datePanel);
+//        			datePanel.updateUI();
+//        			datecounter = 0;
+//        		} else if (datecounter > 1) {
+//        			datecounter = 1;
+//        		} else {
+//        			JPanel datePanel = new JPanel();
+//            		datePanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.RIGHT));
+//            		datePanel.setBounds((int)currentStoryPoint.getX() - 105, (int)currentStoryPoint.getY() -18, 100, 20);
+//        			JLabel jdate = new JLabel(date);
+//        			jdate.setFont(new Font("Courier New",Font.ITALIC,10));
+//        			datePanel.add(jdate);
+//        			this.add(datePanel);
+//        			datePanel.updateUI();
+//        		}
         		
         		buttonPanel.setBounds(30, getHeight()-50, 100, 30);
         		newEvent.setBounds(30, getHeight()-50, 100, 30);
@@ -510,19 +517,19 @@ public class View extends JPanel {
 		  ButtonListener() {
 		  }
 		  
-		  JFrame newEntryFr = new JFrame();  
-		  JTextField titlefield = new JTextField("", 15);
-	      JTextField datefield = new JTextField("", 12);
-	      JTextArea contentfield = new JTextArea(3, 80);
-	      JTextField charfield = new JTextField("", 40);
-		    
 		  public void actionPerformed(ActionEvent e) {
 //			  if (e.getActionCommand().equals("New Event")) {
 			  if (e.getSource() == newEvent) {
 		    	System.out.println("Button has been clicked");
 		    	newEntryFr.setSize(500, 300);
 		        newEntryFr.setVisible(true);
-		        newEntryFr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		        
+	    		titlefield.setText("");
+	    		datefield.setText("");
+	    		contentfield.setText("");
+	    		charfield.setText("");
+
+//	    		newEntryFr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    	JLabel tif = new JLabel("Title: ");
 		    	JLabel daf = new JLabel("Date: ");
 		    	JLabel cof = new JLabel("Text: ");
@@ -564,71 +571,40 @@ public class View extends JPanel {
 		        submit.addActionListener(new ButtonListener());
 		        gpanel.add(submit, lcons);
 		        newEntryFr.add(gpanel);
-//		        String titletext = titlefield.getText();
-//		        System.out.println(titletext);
+//		        String newtitle = titlefield.getText();
+//		        System.out.println("title: " + newtitle);
 			  }
 		  
-//			  if (e.getActionCommand().equals("New Event")) {
 			  if (e.getSource() == submit) {
-		    	System.out.println("SUBMIT DAT ASS");
+		    	
+				System.out.println("Awaiting Submission.");
+		    	
 		    	String newtitle = titlefield.getText();
 		    	String newdate = datefield.getText();
 		    	String newcontent = contentfield.getText();
 		    	String newchars = charfield.getText();
-		    	if ( newtitle.equals(null) ||  newdate.equals(null) || newcontent.equals(null) || newchars.equals(null)) {
+		    	
+		    	newtitle = newtitle.substring(0, Math.min(newtitle.length(), 60));
+	    		newdate = newdate.substring(0, Math.min(newdate.length(), 20));
+	    		newcontent = newcontent.substring(0, Math.min(newcontent.length(), 250));
+	    		newchars = newchars.substring(0, Math.min(newchars.length(), 100));
+	    		
+	    		if ( newtitle.equals("") ||  newdate.equals("") || newcontent.equals("") || newchars.equals("")) {
 		    		System.out.println("DENIED: Submission not complete.");
+			    	newEntryFr.dispose();
 		    	} else {
 		    		System.out.println("title: " + newtitle);
 		    		System.out.println("date: " + newdate);
 		    		System.out.println("content: " + newcontent);
 		    		System.out.println("chars: " + newchars);
-		    		newEntryFr.dispatchEvent(new WindowEvent(newEntryFr, WindowEvent.WINDOW_CLOSING));
+		    		
+		    		String combinedevent = newtitle + ";" + newdate + ";" + newcontent + ";" + newchars;
+		    		
+			    	newEntryFr.dispose();
 		    	}
-//		    	JTextField titlefield = new JTextField("", 15);
-//		        JTextField datefield = new JTextField("", 12);
-//		        JTextArea contentfield = new JTextArea(3, 80);
-//		        JTextField charfield = new JTextField("", 40);
-//		    	JButton submit = new JButton("Submit");
-//		        submit.addActionListener(new ButtonListener());
-//		        JPanel gpanel = new JPanel(new GridBagLayout());
-//		        GridBagConstraints lcons = new GridBagConstraints();
-//		        GridBagConstraints tcons = new GridBagConstraints();
-//		        lcons.gridx = 0;
-//		        lcons.gridy = 0;
-//		        gpanel.add(tif, lcons);
-//		        lcons.gridy = 1;
-//		        gpanel.add(daf, lcons);
-//		        lcons.gridy = 2;
-//		        gpanel.add(cof, lcons);
-//		        lcons.gridy = 5;
-//		        gpanel.add(chf, lcons);
-//		        tcons.fill = GridBagConstraints.HORIZONTAL;
-//		        tcons.gridwidth = 2;
-//		        tcons.ipady = 10;
-//		        tcons.gridx = 1;
-//		        tcons.gridy = 0;
-//		        tcons.weightx = 2;
-//		        gpanel.add(titlefield, tcons);
-//		        tcons.gridy = 1;
-//		        gpanel.add(datefield, tcons);
-//		        tcons.gridy = 2;
-//		        tcons.gridheight = 3;
-//		        gpanel.add(contentfield, tcons);
-//		        tcons.gridy = 5;
-//		        tcons.gridheight = 1;
-//		        gpanel.add(charfield, tcons);
-//		        lcons.gridy = 7;
-//		        lcons.weightx = 3;
-//		        lcons.gridwidth = 3;
-//		        lcons.ipadx = 30;
-//		        gpanel.add(submit, lcons);
-//		        newEntryFr.add(gpanel);
-		        
-//		        String titletext = titlefield.getText();
-//		        System.out.println(titletext);
+
 			  }
 		  }
 	}
 	
-//    Timer test = new Timer(2000,scaleIn);
 }
