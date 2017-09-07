@@ -17,6 +17,11 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -599,6 +604,21 @@ public class View extends JPanel {
 		    		System.out.println("chars: " + newchars);
 		    		
 		    		String combinedevent = newtitle + ";" + newdate + ";" + newcontent + ";" + newchars;
+		    		int lnumber = sorted_events.size()+1;
+		    		String snumber = lnumber + ";";
+		    		String numberedevent = snumber + combinedevent;
+		    		
+		    		System.out.print(numberedevent);
+		    		
+		    		try(FileWriter filew = new FileWriter( "datasets/z_data05.txt", true);
+		    			BufferedWriter buffw = new BufferedWriter(filew);
+		    			PrintWriter out = new PrintWriter(buffw)) 
+					{
+						out.println(numberedevent);
+		    				
+		    		} catch (IOException f) {
+						// TODO Auto-generated catch block
+					}
 		    		
 			    	newEntryFr.dispose();
 		    	}
