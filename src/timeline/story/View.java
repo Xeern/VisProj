@@ -1,6 +1,7 @@
 package timeline.story;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -26,9 +27,11 @@ import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 import timeline.story.Data;
@@ -61,6 +64,9 @@ public class View extends JPanel {
 	Map<Integer, ArrayList<String>> sorted_events = new TreeMap<Integer, ArrayList<String>>(Data.events);
 	Map<Point2D,Integer> segmentAtPoint = new HashMap<Point2D,Integer>();
 	Map<Point2D,JPanel> panelAtPoint = new HashMap<Point2D,JPanel>();
+	
+	static JPanel buttonPanel = new JPanel();
+	static JButton newEvent = new JButton("New Event");
 	
 	public void paint(Graphics g) {
 //		System.out.println("____paint");
@@ -415,6 +421,12 @@ public class View extends JPanel {
 //        		String content = labels.get(2);
 //        		String characters = labels.get(3);
         		
+        		buttonPanel.setBounds(30, getHeight()-50, 100, 30);
+        		newEvent.setBounds(30, getHeight()-50, 100, 30);
+        		newEvent.addActionListener(new ButtonListener());
+        		buttonPanel.add(newEvent);
+        		this.add(buttonPanel);
+        		
         		
         		g.draw(storyEllipse);
         		g.fill(storyEllipse);
@@ -440,6 +452,53 @@ public class View extends JPanel {
 		temp += "</html>";
 		return temp;
 	}
+	
+	public class ButtonListener implements ActionListener {
+		  ButtonListener() {
+		  }
 
+		  public void actionPerformed(ActionEvent e) {
+//			  if (e.getActionCommand().equals("New Event")) {
+			  if (e.getSource() == newEvent) {
+		    	System.out.println("Button has been clicked");
+		    	JFrame newEntryFr = new JFrame();
+		        newEntryFr.setSize(1000, 300);
+		        newEntryFr.setVisible(true);
+		        newEntryFr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		    	JLabel tif = new JLabel("Title: ");
+		    	tif.setBounds(10, 10, 50, 30);
+		    	JLabel daf = new JLabel("Date: ");
+		    	tif.setBounds(10, 50, 50, 50);
+		    	JLabel cof = new JLabel("Text: ");
+		    	tif.setBounds(10, 90, 50, 50);
+		    	JLabel chf = new JLabel("Characters: ");
+		    	tif.setBounds(10, 140, 50, 50);
+		    	JTextField titlefield = new JTextField("", 15);
+		    	titlefield.setBounds(70, 10, 300, 30);
+		        JTextField datefield = new JTextField("", 12);
+		    	datefield.setBounds(70, 50, 300, 30);
+		        JTextField contentfield = new JTextField("", 80);
+		    	contentfield.setBounds(70, 90, 300, 30);
+		        JTextField charfield = new JTextField("", 40);
+		    	charfield.setBounds(70, 140, 300, 30);
+		    	JButton submit = new JButton("Submit");
+//		        submit.addActionListener(new BUttonlistener());
+		        JPanel gpanel = new JPanel();		      
+		        gpanel.add(tif, BorderLayout.WEST);
+		        gpanel.add(titlefield, BorderLayout.EAST);
+		        gpanel.add(daf, BorderLayout.WEST);
+		        gpanel.add(datefield, BorderLayout.EAST);
+		        gpanel.add(cof, BorderLayout.WEST);
+		        gpanel.add(contentfield, BorderLayout.EAST);
+		        gpanel.add(chf, BorderLayout.WEST);
+		        gpanel.add(charfield, BorderLayout.EAST);
+		        gpanel.add(submit, BorderLayout.CENTER);
+		        newEntryFr.add(gpanel);
+//		        String titletext = titlefield.getText();
+//		        System.out.println(titletext);
+			  }
+		  }
+	}
+	
 //    Timer test = new Timer(2000,scaleIn);
 }

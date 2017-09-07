@@ -58,6 +58,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
+		
 		Shape triDown = view.createDownTriangle();
 		Shape triUp = view.createUpTriangle();
 		Shape cross = view.createCross();
@@ -71,7 +72,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				if(triUp.contains(x,y)) {
 					up = new Timer(10, moveUp);
 					up.start();
-					if(down != null) {
+					if(down != null) {	
 						down.stop();
 					}
 				}
