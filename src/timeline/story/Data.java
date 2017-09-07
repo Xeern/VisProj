@@ -15,7 +15,8 @@ public class Data{
 	
 	public static void importValues() throws IOException {
 		try {
-			File file = new File("datasets/z_data01.txt");
+//			File file = new File("datasets/z_data01.txt");
+			File file = new File("datasets/z_data02.txt");
 		
 			List<String> lines = new ArrayList<String>();
 		

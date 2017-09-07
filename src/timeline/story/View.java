@@ -43,6 +43,7 @@ public class View extends JPanel {
 	StoryTimeline story = new StoryTimeline();
 	Window window = new Window();
 	int lastHeight = 0;
+	int parts = 4;
 	int storyRange;
 	int lowestStoryKey;
 	boolean firstOpen = true;
@@ -50,12 +51,15 @@ public class View extends JPanel {
 	boolean detailView = false;
 	boolean overviewRect = false;
 	double translateY = 0.0;
+	double startPart = (double)(parts-1)/(parts);
 	boolean mainView = true;
 	boolean charView = false;
 	
 	double factor = 1.0;
 	
-	List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>(); 
+	Rectangle2D oRect = null;
+	
+	List<Entry<Integer, ArrayList<String>>> charlist = new ArrayList<Entry<Integer, ArrayList<String>>>();
 	
 	boolean alreadyPainted = false;
 	
@@ -80,7 +84,7 @@ public class View extends JPanel {
 			}
 		}
 		if(firstOpen) {
-			translateY = getHeight()/2;
+			translateY = getHeight()*startPart;
 			firstOpen = false;
 		}
 		
@@ -97,20 +101,19 @@ public class View extends JPanel {
 
         if(overview) {
         	if(mainView) {
-//        		System.out.println("main");
         		drawOverview(g2D, list);
         	} else {
-//        		System.out.println("char");
+        		checkFirstEntry(charlist);
+        		System.out.println(charlist.get(0));
         		drawOverview(g2D, charlist);
         	}
         }
 
         if(detailView) {
         	if(mainView) {
-//        		System.out.println("main");
         		drawDetailview(g2D, list);
         	} else {
-//        		System.out.println("char");
+        		System.out.println(charlist.get(0));
         		drawDetailview(g2D, charlist);
         	}
         }
@@ -118,24 +121,25 @@ public class View extends JPanel {
 //        System.out.println("view end: " + alreadyPainted);
 	}
 	
-//	ActionListener scaleIn = new AbstractAction() {
-//		public void actionPerformed(ActionEvent e) {
-//			Graphics2D temp = (Graphics2D)View.this.getGraphics();
-//			if(detailView = true) {
-//				if(factor < 0.8) {
-//					factor += (1.0/10.0);
-//				}
-//				if(factor >= 0.8 && factor < 1) {
-//					factor += (1.0/20.0);
-//				}
-//				View.this.repaint();
-//			}
-//		}
-//	};
-	
 	public void getMainview() {
 		this.repaint();
 		mainView = true;	
+	}
+	
+	public void checkFirstEntry(List<Entry<Integer, ArrayList<String>>> list) {
+		int lowestInt = list.get(0).getKey();
+		Point2D lowestPoint = null;
+		for(Point2D p : storyPoints) {
+			if(segmentAtPoint.get(p) == lowestInt) {
+				lowestPoint = p;
+			}
+		}
+		for(int i = 0; i < parts; i++) {
+			Rectangle2D temp = new Rectangle2D.Double(0, (getHeight()/parts)*i,getWidth(),getHeight()/parts);
+			if(temp.contains(lowestPoint)) {
+				System.out.println(i);
+			}
+		}
 	}
 	
 	public Shape createCross() {
@@ -195,24 +199,28 @@ public class View extends JPanel {
         	g2D.setStroke(new BasicStroke(1));
 		}
 
+
+        Line2D infLine = new Line2D.Float(midX, 0, midX, (int)translateY+(getHeight()));
+        g2D.setStroke(new BasicStroke(3));
+        g2D.draw(infLine);
+        g2D.setStroke(new BasicStroke(1));
         
-        Rectangle2D colorRect = new Rectangle2D.Double(0, translateY*0.2, getWidth()*0.2, getHeight()*0.1+1);
+        Rectangle2D colorRect = new Rectangle2D.Double(0, translateY*0.2, getWidth()*0.2, getHeight()*0.2/parts+1);
         g2D.setColor(new Color(200,200,200,100));
         g2D.fill(colorRect);
         g2D.setColor(new Color(51,51,51));
         
-        Graphics2D part = g2D;
-        part.scale(2*factor, 2*factor);
-        part.translate(-getWidth()/4*factor, -translateY*factor);
-        g2D.draw(mainLine);
-        System.out.println(factor);
-
-
+        oRect = new Rectangle2D.Double(0, 0, getWidth()*0.2, getHeight()*0.2);
         
         if(!alreadyPainted) {
         	createStorypoints(g2D, mainLine, list);
         }
         alreadyPainted = false;
+        
+        Graphics2D part = g2D;
+        part.scale(2*factor, 2*factor);
+        part.translate(-getWidth()/4*factor, -translateY*factor);
+        g2D.draw(mainLine);
         
 		if(this.contains(0, (int)storyPoints.get(storyPoints.size()-1).getY())) {
 			g2D.translate(getWidth()/4, translateY);
@@ -237,12 +245,16 @@ public class View extends JPanel {
         part.translate(getWidth()/4, translateY);
 		g2D.scale(0.1, 0.1);
 		drawOverview(g2D, list);
+		g2D.scale(10, 10);
+		g2D.translate(-getWidth()/4, -translateY);
+
 		overviewRect = false;
+
 	}
 	
 	public void drawOverview(Graphics2D g2D, List<Entry<Integer, ArrayList<String>>> list) {
         int midX = getWidth()/2;
-        
+
         Line2D mainLine = new Line2D.Float(midX, 0, midX, getHeight());
         Shape cross = createCross();
         g2D.draw(mainLine);
@@ -283,14 +295,14 @@ public class View extends JPanel {
 			}
         }
         
-        if(overview == true) {
+        if(overview) {
 			g2D.setStroke(new BasicStroke(3));
         	g2D.draw(cross);
         	g2D.setStroke(new BasicStroke(1));
 			drawOverview(g2D, charlist);
         }
 
-        if(detailView == true) {
+        if(detailView) {
 			g2D.setStroke(new BasicStroke(3));
         	g2D.draw(cross);
         	g2D.setStroke(new BasicStroke(1));
@@ -323,8 +335,10 @@ public class View extends JPanel {
         
         int midX = getWidth()/2;
 		
-		storyPoints.clear();
-		storyEllipses.clear();
+        if(!overviewRect) {
+        	storyPoints.clear();
+        	storyEllipses.clear();
+        }
         for(int i = 0; i <= range; i++) {
         	boolean breakerino = false;
         	Point2D currentStoryPoint = new Point2D.Double(getWidth()/2,start.getY()-(freeSpace+i*storyStep));
@@ -336,35 +350,31 @@ public class View extends JPanel {
               
             	int tempCount = 0;
             	for(String s : titles) {
-            		if(!title.equalsIgnoreCase(s)) {
-            			tempCount += 1;
-//            			System.out.println(title + " != " + s + "TempCount: " + tempCount);
-            		}
-            		if(tempCount == titles.size()) {
-            			breakerino = true;
-            		}
+            		if(!title.equalsIgnoreCase(s)) tempCount += 1;
+            		if(tempCount == titles.size()) breakerino = true;
             	}
             	if(breakerino) {
             		currentSegment += 1;
             		continue;
             	}
               
-            	if(overviewRect == true) {
+            	if(overviewRect) {
             		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
             		g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
                 
             		g.draw(storyEllipse);
             		g.fill(storyEllipse);
                     segmentAtPoint.put(currentStoryPoint, currentSegment);
-                    storyPoints.add(currentStoryPoint);
-                    storyEllipses.add(storyEllipse);
+//                    storyPoints.add(currentStoryPoint);
+//                    storyEllipses.add(storyEllipse);
                     currentSegment += 1;
             	} else {
             		JPanel viewPanel = new JPanel();
-        		if(detailView == true) {
-            		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*2);
+        		if(detailView) {
+            		currentStoryPoint.setLocation(currentStoryPoint.getX(), (currentStoryPoint.getY()-translateY)*parts);
+            		storyEllipse = new Ellipse2D.Double((int)currentStoryPoint.getX()-5, (int)currentStoryPoint.getY()-2.5,10.0,10.0);
         		}
-        		if(overviewRect == true) {
+        		if(overviewRect) {
         			g.drawString(title, (int)((currentStoryPoint.getX() + 5)), (int)((currentStoryPoint.getY()*0.5 + translateY)));
         		}
         		viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
@@ -440,6 +450,10 @@ public class View extends JPanel {
         		currentSegment += 1;
         	}
         }
+//        if(overviewRect) System.out.println(overviewRect);
+//        System.out.println("Story Ellipses: " + storyEllipses.size());
+//        System.out.println("Story Points:   " + storyPoints.size());
+//        System.out.println("Story Ellipses: " + storyEllipses);
 	}
 
 	public static String verticalText(String horizontal) { // fancy vertical label
