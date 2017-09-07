@@ -38,9 +38,10 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	
 	private View view = null;
 	JPanel openPanel = null;
-	boolean open = false;
+	boolean firstClick = true;
 	Timer down = null;
 	Timer up = null;
+	int scrollCount = 0;
 
 	Rectangle2D oldBounds = null;
 	
@@ -56,21 +57,45 @@ public class MouseController implements MouseListener,MouseMotionListener {
     };
 	
 	public void mouseClicked(MouseEvent e) {
+		if (firstClick) {
+			scrollCount = (int)(view.parts * view.startPart);
+			firstClick = false;
+		}
 		int x = e.getX();
 		int y = e.getY();
 		Shape triDown = view.createDownTriangle();
 		Shape triUp = view.createUpTriangle();
 		Shape cross = view.createCross();
 		
+		if(view.detailView) {
+			Rectangle2D overview = view.oRect;
+			double height = overview.getHeight()/view.parts;
+			for (int i = 0; i < view.parts; i++) {
+				overview.setFrame(new Rectangle2D.Double(0, height*i, overview.getWidth(), height));
+				if(overview.contains(x, y)) {
+					if(down != null) {
+						down.stop();
+					}
+					if(up != null) {
+						up.stop();
+					}
+					scrollCount = i;
+					view.setTranslateY((view.getHeight()/view.parts)*i);
+					view.repaint();
+				}
+			}
+		}
+		
 		if(cross.getBounds2D().contains(x, y)) {
 			view.getMainview();
 		}
 		
-		if(view.detailView == true) {
+		if(view.detailView) {
 			if(!view.contains(0, (int)view.storyPoints.get(view.storyPoints.size()-1).getY())) {
 				if(triUp.contains(x,y)) {
-					up = new Timer(10, moveUp);
+					up = new Timer(25, moveUp);
 					up.start();
+					scrollCount -= 1;
 					if(down != null) {
 						down.stop();
 					}
@@ -78,8 +103,9 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			}
 			if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
 				if(triDown.contains(x,y)) {
-					down = new Timer(2, moveDown);
+					down = new Timer(25, moveDown);
 					down.start();
+					scrollCount += 1;
 					if(up != null) {
 						up.stop();
 					}
@@ -98,9 +124,10 @@ public class MouseController implements MouseListener,MouseMotionListener {
 //					System.out.println(currentEvent);
 				}
 			}
-			if(view.detailView == true) {
+			if(view.detailView) {
 				double tmpX = view.storyEllipses.get(i).getMinX()-3;
-				double tmpY = (view.storyEllipses.get(i).getMinY()-view.translateY)*2;
+//				double tmpY = (view.storyEllipses.get(i).getMinY()-view.translateY)*2;
+				double tmpY = (view.storyEllipses.get(i).getMinY());
 //				System.out.println("tmpY: " + tmpY);
 				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
 				if(tmp.contains(x,y)) {
@@ -118,7 +145,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		}
 //		System.out.println(currentPoint);
 		if(currentPoint != null) {
-//			System.out.println("paint panel");
+			System.out.println("paint panel");
 			int currentSegment = view.segmentAtPoint.get(currentPoint);
 			ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
 			String content = currentEvent.get(2);
@@ -134,12 +161,12 @@ public class MouseController implements MouseListener,MouseMotionListener {
 				int ueberschuss = (int) (currentPoint.getY() - 21 + (25 + contentRows*25) - view.lastHeight) + 10;
 				int temp = (int) (currentPoint.getY() - 21 + (25 + contentRows*25));
 						
-				System.out.println("currentY: " + currentPoint.getY());
-				System.out.println("temp: " + temp);
-				System.out.println("lastheight: " + view.lastHeight);
-				System.out.println("ueberschuss: " + ueberschuss + "\n");
+//				System.out.println("currentY: " + currentPoint.getY());
+//				System.out.println("temp: " + temp);
+//				System.out.println("lastheight: " + view.lastHeight);
+//				System.out.println("ueberschuss: " + ueberschuss + "\n");
 			
-				viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - ueberschuss, 300, 25 + contentRows*25);				
+				viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - ueberschuss, 300, 25 + contentRows*25);	
 			}
 
 //			viewPanel.setLayout((LayoutManager) new FlowLayout(FlowLayout.LEFT));
@@ -171,28 +198,29 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	
 	ActionListener moveDown = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-			int length = view.getHeight()/2;
-			if(view.getHeight()/2 > view.translateY) {
-				if(view.translateY < length*1/12) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/128);
+			int length = view.getHeight()/view.parts;
+			double end = length * scrollCount;
+			System.out.println("End: " + end);
+			System.out.println("length*11/12: " + length*11/12);
+			System.out.println("end-view.translateY: " + (end-view.translateY));
+			if(end > view.translateY) {
+				if(end-view.translateY > length*11/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/(48*view.parts));
 				}
-				if(view.translateY >= length*1/12 && view.translateY < length*2/12) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/64);
+				if(end-view.translateY <= length*11/12 && end-view.translateY > length*10/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/(32*view.parts));
 				}
-				if(view.translateY >= length*2/12 && view.translateY < length*4/12) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/18);
+				if(end-view.translateY <= length*10/12 && end-view.translateY > length*7/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/(16*view.parts));
 				}
-				if(view.translateY >= length*4/12 && view.translateY < length*8/12) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/32);
+				if(end-view.translateY <= length*7/12 && end-view.translateY > length*4/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/(32*view.parts));
 				}
-				if(view.translateY >= length*8/12 && view.translateY < length*10/12) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/64);
+				if(end-view.translateY <= length*4/12 && end-view.translateY > length*2/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/(48*view.parts));
 				}
-				if(view.translateY >= length*10/12 && view.translateY < length*23/24) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/128);
-				}
-				if(view.translateY >= length*23/24) {
-					view.setTranslateY((int)view.translateY + view.getHeight()/256);
+				if(end-view.translateY <= length*2/12) {
+					view.setTranslateY((int)view.translateY + view.getHeight()/(64*view.parts));
 				}
 				view.repaint();
 			}
@@ -201,32 +229,29 @@ public class MouseController implements MouseListener,MouseMotionListener {
 
 	ActionListener moveUp = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-			int length = view.getHeight()/2;
-			System.out.println(up.isRunning());
-			if(0 < view.translateY) {
-				if(view.translateY > length*13/14) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/128);
+			int length = view.getHeight()/view.parts;
+			double end = length * scrollCount;
+			if(end < view.translateY) {
+				if(view.translateY-end > length*11/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/(48*view.parts));
 				}
-				if(view.translateY <= length*13/14 && view.translateY > length*10/12) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/64);
+				if(view.translateY-end <= length*11/12 && view.translateY-end > length*10/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/(32*view.parts));
 				}
-				if(view.translateY <= length*10/12 && view.translateY > length*8/12) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/32);
+				if(view.translateY-end <= length*10/12 && view.translateY-end > length*7/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/(16*view.parts));
 				}
-				if(view.translateY <= length*8/12 && view.translateY > length*4/12) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/18);
+				if(view.translateY-end <= length*7/12 && view.translateY-end > length*4/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/(32*view.parts));
 				}
-				if(view.translateY <= length*4/12 && view.translateY > length*2/12) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/64);
+				if(view.translateY-end <= length*4/12 && view.translateY-end > length*2/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/(48*view.parts));
 				}
-				if(view.translateY <= length*2/12 && view.translateY > length*1/24) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/128);
-				}
-				if(view.translateY <= length*1/24) {
-					view.setTranslateY((int)view.translateY - view.getHeight()/256);
+				if(view.translateY-end <= length*2/12) {
+					view.setTranslateY((int)view.translateY - view.getHeight()/(64*view.parts));
 				}
 				view.repaint();
-			}
+			}			
 		}
 	};
 	
@@ -269,19 +294,19 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			
 		}
 		for(int i = 0; i < view.storyEllipses.size(); ++i) {
-			if(view.overview == true) {
+			if(view.overview) {
 				Ellipse2D tmp = view.storyEllipses.get(i);
 				if(tmp.contains(x, y)) {
 					currentGraphic.setColor(Color.BLUE);
 					currentGraphic.draw(tmp);
 					currentGraphic.fill(tmp);
 				} else {
-					currentGraphic.setColor(Color.BLACK);
+					currentGraphic.setColor(Color.DARK_GRAY);
 					currentGraphic.draw(tmp);
 					currentGraphic.fill(tmp);
 				}
 			}
-			if(view.detailView == true) {
+			if(view.detailView) {
 				if(!view.contains(0, (int)view.storyPoints.get(view.storyPoints.size()-1).getY())) {
 					if(triUp.contains(x,y)) {
 						currentGraphic.setColor(new Color(100, 100, 100));
@@ -301,15 +326,15 @@ public class MouseController implements MouseListener,MouseMotionListener {
 					}
 				}
 
-				double tmpX = view.storyEllipses.get(i).getMinX()-3;
-				double tmpY = (view.storyEllipses.get(i).getMinY()-view.translateY)*2;
-				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
+				double tmpX = view.storyEllipses.get(i).getMinX();
+				double tmpY = view.storyEllipses.get(i).getMinY();
+//				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
+				Ellipse2D tmp = view.storyEllipses.get(i);
 				if(tmp.contains(x,y)) {
 					currentGraphic.setColor(Color.BLUE);
 					currentGraphic.draw(tmp);
 					currentGraphic.fill(tmp);
  				} else {
-					currentGraphic.setColor(Color.BLACK);
 					currentGraphic.draw(tmp);
 					currentGraphic.fill(tmp);
 				}
