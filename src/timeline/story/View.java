@@ -49,6 +49,8 @@ public class View extends JPanel {
 	Window window = new Window();
 	int lastHeight = 0;
 	int parts = 4;
+	int minScroll = 0;
+	int maxScroll = 3;
 	int storyRange;
 	int lowestStoryKey;
 	boolean firstOpen = true;
@@ -83,7 +85,6 @@ public class View extends JPanel {
 //		System.out.println("view start: " + alreadyPainted);
 		Graphics2D g2D = (Graphics2D)g;
 //        g2D.clearRect(0, 0, getWidth(), getHeight());
-		
 		if(translateY != 0.0) {
 			if(lastHeight != getHeight()) {
 				firstOpen = true;
@@ -107,19 +108,20 @@ public class View extends JPanel {
 
         if(overview) {
         	if(mainView) {
+        		minScroll = 0;
+        		maxScroll = parts-1;
         		drawOverview(g2D, list);
         	} else {
-        		checkFirstEntry(charlist);
-        		System.out.println(charlist.get(0));
         		drawOverview(g2D, charlist);
         	}
         }
 
         if(detailView) {
         	if(mainView) {
+        		minScroll = 0;
+        		maxScroll = parts-1;
         		drawDetailview(g2D, list);
         	} else {
-        		System.out.println(charlist.get(0));
         		drawDetailview(g2D, charlist);
         	}
         }
@@ -132,6 +134,34 @@ public class View extends JPanel {
 		mainView = true;	
 	}
 	
+	public void getScrollRange(List<Entry<Integer, ArrayList<String>>> list) {
+		int lowestInt = list.get(0).getKey();
+		int highestInt = list.get(list.size()-1).getKey();
+		Point2D lowestPoint = null;
+		Point2D highestPoint = null;
+		for(Point2D p : storyPoints) {
+			if(segmentAtPoint.get(p) == lowestInt) {
+				lowestPoint = p;
+			}
+			if(segmentAtPoint.get(p) == highestInt) {
+				highestPoint = p;
+			}
+		}
+		int step = 0;
+		for(int i = 0; i < parts; i++) {
+			if(translateY == (getHeight()/parts)*i) step = i;
+		}
+		for(int i = parts-1-step; i >= 0-step; i--) {
+			Rectangle2D temp = new Rectangle2D.Double(0, (getHeight())*i, getWidth(), getHeight());
+			if(temp.contains(lowestPoint)) {
+				maxScroll = i+step;
+			}
+			if(temp.contains(highestPoint)) {
+				minScroll = i+step;
+			}
+		}
+	}
+	
 	public void checkFirstEntry(List<Entry<Integer, ArrayList<String>>> list) {
 		int lowestInt = list.get(0).getKey();
 		Point2D lowestPoint = null;
@@ -140,10 +170,11 @@ public class View extends JPanel {
 				lowestPoint = p;
 			}
 		}
-		for(int i = 0; i < parts; i++) {
-			Rectangle2D temp = new Rectangle2D.Double(0, (getHeight()/parts)*i,getWidth(),getHeight()/parts);
+		for(int i = parts-1; i >= 0; i--) {
+			Rectangle2D temp = new Rectangle2D.Double(0, (getHeight()/parts)*i, getWidth(), getHeight()/parts);
 			if(temp.contains(lowestPoint)) {
-				System.out.println(i);
+				setTranslateY((getHeight()/parts)*i);
+				System.out.println(translateY);
 			}
 		}
 	}

@@ -53,6 +53,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
             String labelchar = label.getText();
 //            System.out.println("text: " + labelchar);
             view.drawOverview(labelchar);
+            view.checkFirstEntry(view.charlist);
         }
     };
 	
@@ -71,18 +72,22 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		if(view.detailView) {
 			Rectangle2D overview = view.oRect;
 			double height = overview.getHeight()/view.parts;
+			if(!view.mainView) {
+				view.getScrollRange(view.charlist);
+				System.out.println(view.maxScroll + " " + view.minScroll);
+			}
 			for (int i = 0; i < view.parts; i++) {
 				overview.setFrame(new Rectangle2D.Double(0, height*i, overview.getWidth(), height));
-				if(overview.contains(x, y)) {
-					if(down != null) {
-						down.stop();
-					}
-					if(up != null) {
-						up.stop();
-					}
-					scrollCount = i;
-					view.setTranslateY((view.getHeight()/view.parts)*i);
-					view.repaint();
+				if(overview.contains(x, y) && i <= view.maxScroll && i >= view.minScroll ) {
+							if(down != null) {
+								down.stop();
+							}
+							if(up != null) {
+								up.stop();
+							}
+							scrollCount = i;
+							view.setTranslateY((view.getHeight()/view.parts)*i);
+							view.repaint();
 				}
 			}
 		}
@@ -146,7 +151,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		}
 //		System.out.println(currentPoint);
 		if(currentPoint != null) {
-			System.out.println("paint panel");
+//			System.out.println("paint panel");
 			int currentSegment = view.segmentAtPoint.get(currentPoint);
 			ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
 			String content = currentEvent.get(2);
