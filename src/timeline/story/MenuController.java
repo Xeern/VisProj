@@ -25,22 +25,13 @@ public class MenuController {
 	}
 	
 	public void toggleOverview(boolean b) {
-		if(b == true) {
-//			if(scale != null) {
-//				scale.stop();
-//			}
+		if(b) {
 			view.overview = true;
 			view.detailView = false;
 			view.repaint();
 		} else {
-//			scale = new Timer(550, view.scaleIn);
 			view.overview = false;
 			view.detailView = true;
-//			scale.start();
-//			if(view.factor >= 1) {
-//				scale.stop();
-//			}
-//			view.updateUI();
 			view.repaint();
 		}		
 	}
