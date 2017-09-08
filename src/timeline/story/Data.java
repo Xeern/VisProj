@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Data{
 	public static HashMap<Integer, ArrayList<String>> events = new HashMap<Integer, ArrayList<String>>(); 
@@ -23,6 +24,12 @@ public class Data{
 				try {
 					while (it.hasNext()) {
 						String line = it.nextLine();
+						if (lines.size() >= 1) {
+							String dup_check = lines.get(lines.size() -1);
+							if (line.equalsIgnoreCase(dup_check)) {
+								continue;
+							}
+						}
 						lines.add(line);
 					}
 				} finally {
@@ -31,6 +38,7 @@ public class Data{
 			}
 		
 			for (String line : lines) {
+				//System.out.println(line);
 				String[] splitter = line.split(";", 5);
 				
 				int itemp = Integer.parseInt(splitter[0]);
@@ -38,10 +46,14 @@ public class Data{
 				for(int i = 1; i < 5; i++) {
 					temp.add(splitter[i]);
 				}
+//				System.out.println(temp);
+				
 				events.put(itemp, temp);
 			}
+//			System.out.println(events);
 		
 		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
