@@ -40,8 +40,6 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	Timer down = null;
 	Timer up = null;
 	
-
-	
 	
 	/* initiate character view
 	 * */
