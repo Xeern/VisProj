@@ -1,15 +1,10 @@
 -8;Vergangenheit;Dezember 2016;Ereignisse, die vor dem Beginn der Geschichte passieren und moeglicherweise erwaehnt werden;Tom+Max
--3;Rückblende;Juli 2017;Wird während der Geschichte erzählt, geschah aber vor dem ersten Kapitel;Hannah+Tom+Olli
-0;Start;1. September 2017;Hier beginnt das erste Kapitel oder hier geschieht das wichtigste Ereignis das die Geschichte ins Rollen bringt. Frei wählbar.;Tom+Tina+Tim
-1;Nächster Tag;2. September 2017;Folgetage sind meist am nächsten Punkt anzutreffen.;Tim+Olli+Hannah
+-3;Rueckblende;Juli 2017;Wird waehrend der Geschichte erzaehlt, geschah aber vor dem ersten Kapitel;Hannah+Tom+Olli
+0;Start;1. September 2017;Hier beginnt das erste Kapitel oder hier geschieht das wichtigste Ereignis das die Geschichte ins Rollen bringt. Frei waehlbar.;Tom+Tina+Tim
+1;Naechster Tag;2. September 2017;Folgetage sind meist am naechsten Punkt anzutreffen.;Tim+Olli+Hannah
 4;Ein neuens Ereignis;;Datum ist optional, da die Index-Nummer die Position bestimmt;Tom+Tina
-8;Nächste Woche;9. September 2017;Irgendetwas passiert;Max+Hannah+Tom
-9;Ein neueres Ereignis;September 2017;Genaues Datum ist unklar, ist allerdings nach "Nächster Woche" passiert.;Tina+Olli+Hannah
+8;Naechste Woche;9. September 2017;Irgendetwas passiert;Max+Hannah+Tom
+9;Ein neueres Ereignis;September 2017;Genaues Datum ist unklar, ist allerdings nach "Naechster Woche" passiert.;Tina+Olli+Hannah
 11;Vorletztes Ereignis;;Irgendwas passiert mal wieder;Tom+Tim+Hannah+Max+Olli
 15;Finale;Oktober 2017;Krasses Battle;Tom+Max+Olli
 18;Zukunft;2018;Ende;Tom+Tim+Tina+Hannah
-19;HELLO I'M BACK;2019;BADABING;Tim
-20;waadddddupppp;later;yo;CHRIST IN DA HOUSE
-21;but why button twice;i dont know;fix that;Tim
-21;but why button twice;i dont know;fix that;Tim
-21;but why button twice;i dont know;fix that;Tim
