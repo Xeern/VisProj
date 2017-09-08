@@ -91,6 +91,9 @@ public class View extends JPanel {
 //		System.out.println("____paint");
 //		System.out.println("view start: " + alreadyPainted);
 		Graphics2D g2D = (Graphics2D)g;
+		
+		sorted_events.clear();
+		sorted_events = new TreeMap<Integer, ArrayList<String>>(Data.events);
 //        g2D.clearRect(0, 0, getWidth(), getHeight());
 		if(translateY != 0.0) {
 			if(lastHeight != getHeight()) {
@@ -525,7 +528,7 @@ public class View extends JPanel {
 		  public void actionPerformed(ActionEvent e) {
 //			  if (e.getActionCommand().equals("New Event")) {
 			  if (e.getSource() == newEvent) {
-		    	System.out.println("Button has been clicked");
+		    	System.out.println("New Event");
 		    	newEntryFr.setSize(500, 300);
 		        newEntryFr.setVisible(true);
 		        
@@ -539,9 +542,13 @@ public class View extends JPanel {
 		    	JLabel daf = new JLabel("Date: ");
 		    	JLabel cof = new JLabel("Text: ");
 		    	JLabel chf = new JLabel("Characters: ");
+		    	titlefield.setToolTipText("Please add a title with max. 60 characters.");
+		    	titlefield.setToolTipText("Please insert a correct date in this format: (DD.) Month JJJJ (e.g. \"01. January 2015\").");
+		    	contentfield.setToolTipText("Please sum up the event in max. 250 characters.");
 		    	contentfield.setOpaque(true);
 				contentfield.setLineWrap(true);
 				contentfield.setWrapStyleWord(true);
+				charfield.setToolTipText("Please add all occurring characters in the following format:  forename surname+forename+title surname (e.g. \"Hannah Smith+Tom+Professor McDonald\")");
 		        JPanel gpanel = new JPanel(new GridBagLayout());
 		        GridBagConstraints lcons = new GridBagConstraints();
 		        GridBagConstraints tcons = new GridBagConstraints();
@@ -612,7 +619,7 @@ public class View extends JPanel {
 		    		int newnumber = lastInsertedEntry.getKey()+1;
 		    		String numberedevent = newnumber + ";" + combinedevent;
 		    		
-		    		System.out.print(numberedevent);
+		    		System.out.println(numberedevent);
 		    		
 		    		try(FileWriter filew = new FileWriter( "datasets/z_data02.txt", true);
 		    			BufferedWriter buffw = new BufferedWriter(filew);
@@ -623,6 +630,14 @@ public class View extends JPanel {
 		    		} catch (IOException f) {
 						// TODO Auto-generated catch block
 					}
+		    		
+		    		try {
+						Data.importValues();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		    		View.this.repaint();
 		    		
 			    	newEntryFr.dispose();
 		    	}

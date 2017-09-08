@@ -24,6 +24,12 @@ public class Data{
 				try {
 					while (it.hasNext()) {
 						String line = it.nextLine();
+						if (lines.size() >= 1) {
+							String dup_check = lines.get(lines.size() -1);
+							if (line.equalsIgnoreCase(dup_check)) {
+								continue;
+							}
+						}
 						lines.add(line);
 					}
 				} finally {
@@ -31,7 +37,6 @@ public class Data{
 				}
 			}
 		
-			//for (int i = 0; i < lines.size(); i++) {
 			for (String line : lines) {
 				//System.out.println(line);
 				String[] splitter = line.split(";", 5);
