@@ -604,13 +604,17 @@ public class View extends JPanel {
 		    		System.out.println("chars: " + newchars);
 		    		
 		    		String combinedevent = newtitle + ";" + newdate + ";" + newcontent + ";" + newchars;
-		    		int lnumber = sorted_events.size()+1;
-		    		String snumber = lnumber + ";";
-		    		String numberedevent = snumber + combinedevent;
+		    		
+		    		List<Entry<Integer, ArrayList<String>>> list = new ArrayList<Entry<Integer, ArrayList<String>>>(sorted_events.entrySet());
+		            int ecount = sorted_events.size();
+		            Entry<Integer, ArrayList<String>> lastInsertedEntry = list.get(ecount-1);
+
+		    		int newnumber = lastInsertedEntry.getKey()+1;
+		    		String numberedevent = newnumber + ";" + combinedevent;
 		    		
 		    		System.out.print(numberedevent);
 		    		
-		    		try(FileWriter filew = new FileWriter( "datasets/z_data05.txt", true);
+		    		try(FileWriter filew = new FileWriter( "datasets/z_data02.txt", true);
 		    			BufferedWriter buffw = new BufferedWriter(filew);
 		    			PrintWriter out = new PrintWriter(buffw)) 
 					{
