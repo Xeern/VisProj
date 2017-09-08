@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,37 +13,39 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 import timeline.story.View;
-import timeline.window.Window;
 
 public class MouseController implements MouseListener,MouseMotionListener {
 	
 	private View view = null;
+	
 	JPanel openPanel = null;
-	boolean firstClick = true;
-	Timer down = null;
-	Timer up = null;
-	int scrollCount = 0;
-
 	Rectangle2D oldBounds = null;
 	
+	boolean firstClick = true;
+	
+	int scrollCount = 0;
+	
+	Timer down = null;
+	Timer up = null;
+	
+
+	
+	
+	/* initiate character view
+	 * */
 	MouseListener labellistener = new MouseAdapter() {
-        @Override
         public void mouseClicked(MouseEvent e) {
             JLabel label = (JLabel)e.getComponent();
             String labelchar = label.getText();
@@ -66,6 +67,8 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		Shape cross = view.createCross();
 		
 		if(view.detailView) {
+			/* navigation via overview inside detailview
+			 * */
 			Rectangle2D overview = view.oRect;
 			double height = overview.getHeight()/view.parts;
 			if(!view.mainView) {
@@ -75,32 +78,30 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			for (int i = 0; i < view.parts; i++) {
 				overview.setFrame(new Rectangle2D.Double(0, height*i, overview.getWidth(), height));
 				if(overview.contains(x, y) && i <= view.maxScroll && i >= view.minScroll ) {
-							if(down != null) {
-								down.stop();
-							}
-							if(up != null) {
-								up.stop();
-							}
-							scrollCount = i;
-							view.setTranslateY((view.getHeight()/view.parts)*i);
-							view.repaint();
+					if(down != null) down.stop();
+					if(up != null) up.stop();
+					scrollCount = i;
+					view.setTranslateY((view.getHeight()/view.parts)*i);
+					view.repaint();
 				}
 			}
 		}
 		
+		/* exit characterview
+		 * */
 		if(cross.getBounds2D().contains(x, y)) {
 			view.getMainview();
 		}
 		
+		/* decide if scrollbuttons are clickable or not
+		 * */
 		if(view.detailView) {
 			if(!view.contains(0, (int)view.storyPoints.get(view.storyPoints.size()-1).getY())) {
 				if(triUp.contains(x,y)) {
 					up = new Timer(25, moveUp);
 					up.start();
 					scrollCount -= 1;
-					if(down != null) {
-						down.stop();
-					}
+					if(down != null) down.stop();
 				}
 			}
 			if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
@@ -108,46 +109,36 @@ public class MouseController implements MouseListener,MouseMotionListener {
 					down = new Timer(25, moveDown);
 					down.start();
 					scrollCount += 1;
-					if(up != null) {
-						up.stop();
-					}
+					if(up != null) up.stop();
 				}
 			}
 			
 		}
+		
+		/* get selected point
+		 * */
 		Point2D currentPoint = null;
 		for(int i = view.storyEllipses.size()-1; i >= 0; --i) {
-			if(view.overview == true) {
-				Ellipse2D tmp = view.storyEllipses.get(i);
-				if(tmp.contains(x, y)) {
-					currentPoint = view.storyPoints.get(i);
-					int currentSegment = view.segmentAtPoint.get(currentPoint);
-					ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
-//					System.out.println(currentEvent);
-				}
-			}
-			if(view.detailView) {
-				double tmpX = view.storyEllipses.get(i).getMinX()-3;
-//				double tmpY = (view.storyEllipses.get(i).getMinY()-view.translateY)*2;
-				double tmpY = (view.storyEllipses.get(i).getMinY());
-//				System.out.println("tmpY: " + tmpY);
-				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
-				if(tmp.contains(x,y)) {
-					currentPoint = view.storyPoints.get(i);
-					int currentSegment = view.segmentAtPoint.get(currentPoint);
-					ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
-//					System.out.println(currentEvent);					
-				}
+			Ellipse2D tmp = view.storyEllipses.get(i);
+			if(tmp.contains(x, y)) {
+				currentPoint = view.storyPoints.get(i);
+//				int currentSegment = view.segmentAtPoint.get(currentPoint);
+//				ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
+//				System.out.println(currentEvent);
 			}
 		}
+		
+		/* close currently open storypanel
+		 * */
 		if(openPanel != null) {
 			if(!openPanel.getBounds().contains(x, y)) {
 				openPanel.setBounds((Rectangle) oldBounds);
 			}
 		}
-//		System.out.println(currentPoint);
+		
+		/* open selected storypanel
+		 * */
 		if(currentPoint != null) {
-//			System.out.println("paint panel");
 			int currentSegment = view.segmentAtPoint.get(currentPoint);
 			ArrayList<String> currentEvent = view.sorted_events.get(currentSegment);
 			String content = currentEvent.get(2);
@@ -157,18 +148,11 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			JPanel viewPanel = view.panelAtPoint.get(currentPoint);
 			oldBounds = (Rectangle2D) viewPanel.getBounds();
 			
-			viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - 21, 300, 25 + contentRows*25);
+			viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - 21, 300, 25 + contentRows*22);
 
 			if((currentPoint.getY() - 21 + (25 + contentRows*25)) >= view.lastHeight) {
-				int ueberschuss = (int) (currentPoint.getY() - 21 + (25 + contentRows*25) - view.lastHeight) + 10;
-				int temp = (int) (currentPoint.getY() - 21 + (25 + contentRows*25));
-						
-//				System.out.println("currentY: " + currentPoint.getY());
-//				System.out.println("temp: " + temp);
-//				System.out.println("lastheight: " + view.lastHeight);
-//				System.out.println("ueberschuss: " + ueberschuss + "\n");
-			
-				viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - ueberschuss, 300, 25 + contentRows*25);	
+				int ueberschuss = (int) (currentPoint.getY() - 21 + (contentRows*25) - view.lastHeight) + 10;			
+				viewPanel.setBounds((int)currentPoint.getX() + 8, (int)currentPoint.getY() - ueberschuss, 300, contentRows*22);	
 			}
 
 			JTextArea textArea = new JTextArea(content);
@@ -194,13 +178,12 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		}
 	}
 	
+	/* create a sliding motion
+	 * */
 	ActionListener moveDown = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 			int length = view.getHeight()/view.parts;
 			double end = length * scrollCount;
-			System.out.println("End: " + end);
-			System.out.println("length*11/12: " + length*11/12);
-			System.out.println("end-view.translateY: " + (end-view.translateY));
 			if(end > view.translateY) {
 				if(end-view.translateY > length*11/12) {
 					view.setTranslateY((int)view.translateY + view.getHeight()/(48*view.parts));
@@ -280,6 +263,9 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		Shape triDown = view.createDownTriangle();
 		Shape triUp = view.createUpTriangle();
 		Shape cross = view.createCross();
+		
+		/* show if coursor is hovering over close button
+		 * */
 		if(cross.getBounds2D().contains(x, y) && !view.mainView) {
 			 currentGraphic.setColor(Color.RED);
 			 currentGraphic.setStroke(new BasicStroke(3));
@@ -291,53 +277,45 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			}
 			
 		}
+		
+		/* show if coursor is hovering over storypoint
+		 * */
 		for(int i = 0; i < view.storyEllipses.size(); ++i) {
-			if(view.overview) {
-				Ellipse2D tmp = view.storyEllipses.get(i);
-				if(tmp.contains(x, y)) {
-					currentGraphic.setColor(Color.BLUE);
-					currentGraphic.draw(tmp);
-					currentGraphic.fill(tmp);
+			Ellipse2D tmp = view.storyEllipses.get(i);
+			if(tmp.contains(x, y)) {
+				currentGraphic.setColor(Color.BLUE);
+				currentGraphic.draw(tmp);
+				currentGraphic.fill(tmp);
+			} else {
+				currentGraphic.setColor(Color.DARK_GRAY);
+				currentGraphic.draw(tmp);
+				currentGraphic.fill(tmp);
+			}
+		}
+			
+		/* show if coursor is hovering over scrollbutton
+		 * */
+		if(view.detailView) {
+			if(!view.contains(0, (int)view.storyPoints.get(view.storyPoints.size()-1).getY())) {
+				if(triUp.contains(x,y)) {
+					currentGraphic.setColor(new Color(100, 100, 100));
+					currentGraphic.fill(triUp);
 				} else {
-					currentGraphic.setColor(Color.DARK_GRAY);
-					currentGraphic.draw(tmp);
-					currentGraphic.fill(tmp);
+					currentGraphic.setColor(new Color(54,54,54));
+					currentGraphic.fill(triUp);
 				}
 			}
-			if(view.detailView) {
-				if(!view.contains(0, (int)view.storyPoints.get(view.storyPoints.size()-1).getY())) {
-					if(triUp.contains(x,y)) {
-						currentGraphic.setColor(new Color(100, 100, 100));
-						currentGraphic.fill(triUp);
-					} else {
-						currentGraphic.setColor(new Color(54,54,54));
-						currentGraphic.fill(triUp);
-					}
-				}
-				if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
-					if(triDown.contains(x,y)) {
-						currentGraphic.setColor(new Color(100, 100, 100));
-						currentGraphic.fill(triDown);
-					} else {
-						currentGraphic.setColor(new Color(54,54,54));
-						currentGraphic.fill(triDown);
-					}
-				}
-
-				double tmpX = view.storyEllipses.get(i).getMinX();
-				double tmpY = view.storyEllipses.get(i).getMinY();
-//				Ellipse2D tmp = new Ellipse2D.Double(tmpX, tmpY, 10, 10);
-				Ellipse2D tmp = view.storyEllipses.get(i);
-				if(tmp.contains(x,y)) {
-					currentGraphic.setColor(Color.BLUE);
-					currentGraphic.draw(tmp);
-					currentGraphic.fill(tmp);
- 				} else {
-					currentGraphic.draw(tmp);
-					currentGraphic.fill(tmp);
+			if(!view.contains(0, (int)view.storyPoints.get(0).getY())) {
+				if(triDown.contains(x,y)) {
+					currentGraphic.setColor(new Color(100, 100, 100));
+					currentGraphic.fill(triDown);
+				} else {
+					currentGraphic.setColor(new Color(54,54,54));
+					currentGraphic.fill(triDown);
 				}
 			}
 		}
+		
 	}
 	
 	public View getView() {
